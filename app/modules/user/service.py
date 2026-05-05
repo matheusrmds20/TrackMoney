@@ -48,7 +48,7 @@ def login_user(db: Session, form_data: OAuth2PasswordRequestForm):
 
 
 def delete_user(db: Session, user_id: int):
-    user = db.query(UserDB).filter(UserDB.id == user_id)
+    user = db.query(UserDB).filter(UserDB.id == user_id).first()
 
     if not user:
         raise HTTPException(status_code=401,detail="usuario nao se coincidem")

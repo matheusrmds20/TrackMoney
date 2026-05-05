@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.auth import get_current_user
 from app.db.session import get_db
 from app.db.models.user import UserDB
-from app.modules.reports.service import balance, by_category, monthly_report
+from app.modules.reports.service import balance, by_category, monthly_report, top_expense, average_expense
+
 
 
 router_reports = APIRouter(prefix="/report", tags=["report"])
@@ -17,8 +18,13 @@ def list_balance(
     user: UserDB =  Depends(get_current_user)
 ):
     
-    return balance(db, user.id, year, month)
-
+    try:
+        return balance(db, user.id, year, month)
+    except HTTPException as m:
+        raise m
+    except Exception as e:
+        print(f"Erro indesperado:{str(e)}")
+        raise HTTPException(status_code=500, detail="Erro interno no servidor")
 
 @router_reports.get("/by_category")
 def list_category(
@@ -39,3 +45,22 @@ def list_monthly(
 ):
     
     return monthly_report(db, user.id, year, month)
+
+@router_reports.get("/top")
+def list_top_expense(
+    month: int,
+    year: int,
+    db: Session = Depends(get_db),
+    user: UserDB = Depends(get_current_user)
+):
+    
+    return top_expense(db, user.id, year, month)
+
+@router_reports.get("/average")
+def list_average(
+    month: int,
+    year: int,
+    db: Session = Depends(get_db),
+    user: UserDB = Depends(get_current_user)
+):
+    return average_expense(db, user.id, year, month)

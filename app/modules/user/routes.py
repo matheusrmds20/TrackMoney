@@ -25,6 +25,9 @@ def authenticate(form_data: OAuth2PasswordRequestForm = Depends(), db: Session =
 
 
 @router_user.delete("/delete_user")
-def delete_user_URL(db: Session = Depends(get_db), user: UserDB = Depends(get_current_user)):
+def delete_user_URL(
+    user_id: int,
+    db: Session = Depends(get_db), 
+    user: UserDB = Depends(get_current_user)):
 
-    return delete_user(db, user.id)
+    return delete_user(db, user_id)

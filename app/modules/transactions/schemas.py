@@ -1,12 +1,13 @@
+from app.db.models.trasactions import TransactionType
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 class TrasactionBase(BaseModel):
     title: str = Field(min_length=1, max_length=100)
     value: float
     description: Optional[str] = None
-    type: str
+    type: TransactionType
     category_id: int
     transaction_date: Optional[datetime] = None
 
@@ -20,7 +21,7 @@ class TransactionCreate(TrasactionBase):
     
     @field_validator("transaction_date")
     def no_future_date(cls, v):
-        if v > datetime.now():
+        if v > datetime.now(timezone.utc):
             raise ValueError("O tempo da transicao nao poder ser no futuro")
         return v
 

@@ -6,14 +6,16 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
+from app.repository.transactions_repository import TransactionRepository
 
 
 def create_transaction(db: Session, user_id: int ,data: TransactionCreate):
     transaction_already_exist = db.query(TransactionsDB).filter(
         func.lower(TransactionsDB.title) == func.lower(data.title)
 ).first()
-
+    
     category = db.query(CategoryDB).filter(CategoryDB.id == data.category_id).first()
+
 
     if transaction_already_exist:
         raise HTTPException(status_code=400, detail="Transacao ja existente")
@@ -21,30 +23,19 @@ def create_transaction(db: Session, user_id: int ,data: TransactionCreate):
     if not data.title or data.title.strip() == "":
         raise HTTPException(status_code=400, detail="A transicao precisa ter pelo menos um caracter")
     
+    if data.value <= 0:
+        raise HTTPException(status_code=400, detail="o valor nao pode ser igual ou menor que zero")
+    
+    if data.type not in TransactionType:
+        raise HTTPException(status_code=400, detail="O tipo da transacao precisa ser 'income' ou 'expense'")
+    
     if not category:
-        raise HTTPException(status_code=400, detail="Categoria nao encontrada")
+       raise HTTPException(status_code=400, detail="ID de Categoria nao se coicidem")
     
-    if category.type != data.type:
-        raise HTTPException(status_code=400, detail="Categorias nao se coicidem")
+    transaction = TransactionRepository.create_transacation(db, user_id, data)
 
 
-    transaction = TransactionsDB(
-        title = data.title,
-        value = data.value,
-        type = data.type,
-        user_id = user_id,
-        category_id = data.category_id
-    )
-
-    try:
-        db.add(transaction)
-        db.commit()
-        db.refresh(transaction)
-        return transaction
-    
-    except IntegrityError as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=f"Erro de integridade: {str(e.orig)}")
+    return transaction
     
 
 def list_transaction(
@@ -105,51 +96,34 @@ def list_transaction(
 
 
 def list_transaction_id(db: Session, user_id: int, transaction_id: int):
-    transaction = db.query(TransactionsDB).filter(
-        TransactionsDB.id == transaction_id,
-        TransactionsDB.user_id == user_id
-).first()
+    transaction = TransactionRepository.transaction_id_repo(db, user_id, transaction_id)
     
     if not transaction:
         raise HTTPException(status_code=404, detail="Transacao nao encontrada")
+    
     
     return transaction
 
 
 def update_transaction(db: Session, user_id: int, transaction_id: int, data: TransactionUpdate):
-    transaction = db.query(TransactionsDB).filter(
-        TransactionsDB.id == transaction_id,
-        TransactionsDB.user_id == user_id
-).first()
+    transaction = TransactionRepository.update_transaction_repo(db, user_id, transaction_id, data)
 
-    try:
-        for field, value in data.model_dump(exclude_unset=True).items():
-            setattr(transaction, field, value)
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transacao nao encontrada")
 
-        db.commit()
-        db.refresh(transaction)
-        return transaction
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(status_code=400, detail="Algo deu errado tente novamente")
+    return transaction
 
 
 
 def delete_transaction(db: Session, user_id:int, transaction_id: int):
-    transaction = db.query(TransactionsDB).filter(
-        TransactionsDB.id == transaction_id,
-        TransactionsDB.user_id == user_id
+
+    transaction_exist = db.query(TransactionsDB).filter(
+        TransactionsDB.id == transaction_id
 ).first()
     
-    if not transaction:
+    if not transaction_exist:
         raise HTTPException(status_code=404, detail="Transacao nao encontrada")
+
+    transaction = TransactionRepository.delete_transaction_repo(db, user_id, transaction_id)
     
-    if transaction.user_id != user_id:
-        raise HTTPException(status_code=403, detail="id da Category incorreta")
-    
-    try:
-        db.delete(transaction)
-        db.commit()
-    except IntegrityError:
-        raise HTTPException(status_code=400, detail="Algo deu errado tente novamente")
-    
+    return transaction
