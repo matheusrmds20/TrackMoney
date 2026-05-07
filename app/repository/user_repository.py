@@ -5,28 +5,45 @@ from sqlalchemy.exc import IntegrityError
 
 
 
-def create_user_repo(db: Session, data):
-    user = UserDB(
-        email = data.email,
-        hashed_password = hash_password(data.password)
-    )
 
-    try:
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+class UserRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def get_email(self, email: str):
+
+        return self.db.query(UserDB).filter(UserDB.email == email).first()
+
+
+
+    def create(self, data):
+        user = UserDB(
+            email = data.email,
+            hashed_password = hash_password(data.password)
+        )
+        try:
+            self.db.add(user)
+            self.db.commit()
+            self.db.refresh(user)
+            return user
+        except IntegrityError as e:
+            self.db.rollback()
+            raise e
+
+
+    def get_user_id(self, user_id: int):
+        user = self.db.query(UserDB).filter(UserDB.id == user_id).first()
 
         return user
-    except IntegrityError as e:
-        db.rollback()
-        raise e
     
-def delete_user_repo(db: Session, user_id: int):
-    user = db.query(UserDB).filter(UserDB.id == user_id)
 
-    try:
-        db.delete(user)
-        db.commit()
-    except ValueError as e:
-        db.rollback()
-        raise e
+        
+    def delete(self, user_id: int):
+        user = self.db.query(UserDB).filter(UserDB.id == user_id).first()
+
+        try:
+            self.db.delete(user)
+            self.db.commit()
+        except ValueError as e:
+            self.db.rollback()
+            raise e

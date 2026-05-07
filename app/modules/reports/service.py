@@ -21,8 +21,6 @@ def balance(db: Session, user_id: int, year, month):
     else:
         end = datetime(year, month + 1, 1)
 
-    
-
     transaction = db.query(
         CategoryDB.type,
         func.sum(TransactionsDB.value)
