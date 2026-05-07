@@ -2,7 +2,6 @@ from app.db.models.trasactions import TransactionsDB
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
-from fastapi import HTTPException
 from app.db.models.categories import CategoryDB
 
 

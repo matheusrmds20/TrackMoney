@@ -14,15 +14,22 @@ router_user = APIRouter(prefix="/auth", tags=["auth"])
 def register_user(user_data: CreateUser, db: Session = Depends(get_db)):
     try:
         return create_user(db, user_data)
-    except:
-        raise HTTPException(status_code=400, detail="Algo deu errado")
-
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro interno no servidor")
+
 @router_user.post("/login")
 def authenticate(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
 
-    return login_user(db, form_data)
-
+    try:
+        return login_user(db, form_data)
+    
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro interno no servidor")
 
 @router_user.delete("/delete_user")
 def delete_user_URL(
@@ -30,4 +37,10 @@ def delete_user_URL(
     db: Session = Depends(get_db), 
     user: UserDB = Depends(get_current_user)):
 
-    return delete_user(db, user_id)
+    try:
+        return delete_user(db, user_id)
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro interno no servidor")

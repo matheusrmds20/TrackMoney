@@ -18,19 +18,19 @@ def create_transaction(db: Session, user_id: int ,data: TransactionCreate):
 
 
     if transaction_already_exist:
-        raise HTTPException(status_code=400, detail="Transacao ja existente")
+        raise ValueError("Transacao ja existente")
     
     if not data.title or data.title.strip() == "":
-        raise HTTPException(status_code=400, detail="A transicao precisa ter pelo menos um caracter")
+        raise ValueError("O titulo da transacao nao pode estar vazio")
     
     if data.value <= 0:
-        raise HTTPException(status_code=400, detail="o valor nao pode ser igual ou menor que zero")
+        raise ValueError("O valor precisa ser maior do zero")
     
     if data.type not in TransactionType:
-        raise HTTPException(status_code=400, detail="O tipo da transacao precisa ser 'income' ou 'expense'")
+        raise ValueError("O tipo da transacao precisa ser 'income' ou 'expense")
     
     if not category:
-       raise HTTPException(status_code=400, detail="ID de Categoria nao se coicidem")
+       raise ValueError("ID de Categoria nao se coicidem")
     
     transaction = TransactionRepository.create_transacation(db, user_id, data)
 
@@ -77,13 +77,10 @@ def list_transaction(
     transactions = db.query(TransactionsDB).filter(TransactionsDB.user_id == user_id).all()
 
     if not transactions:
-        raise HTTPException(status_code=404, detail="Transacao nao encontrada")
-    
-    if page < 1:
-        raise HTTPException(400, "Paginacao tem que ser maior do que 1")
+        raise ValueError("Transacao nao econtrada")
 
     if limit > 100:
-        raise HTTPException(400, "Limite muito alto")
+        raise ValueError("Limite muito alto")
 
 
     return {
@@ -99,7 +96,7 @@ def list_transaction_id(db: Session, user_id: int, transaction_id: int):
     transaction = TransactionRepository.transaction_id_repo(db, user_id, transaction_id)
     
     if not transaction:
-        raise HTTPException(status_code=404, detail="Transacao nao encontrada")
+        raise ValueError("Transacao nao encontrada")
     
     
     return transaction
@@ -109,10 +106,9 @@ def update_transaction(db: Session, user_id: int, transaction_id: int, data: Tra
     transaction = TransactionRepository.update_transaction_repo(db, user_id, transaction_id, data)
 
     if not transaction:
-        raise HTTPException(status_code=404, detail="Transacao nao encontrada")
+        raise ValueError("Transacao nao encontrada")
 
     return transaction
-
 
 
 def delete_transaction(db: Session, user_id:int, transaction_id: int):
@@ -122,7 +118,7 @@ def delete_transaction(db: Session, user_id:int, transaction_id: int):
 ).first()
     
     if not transaction_exist:
-        raise HTTPException(status_code=404, detail="Transacao nao encontrada")
+        raise ValueError("Transacao nao encontrada")
 
     transaction = TransactionRepository.delete_transaction_repo(db, user_id, transaction_id)
     

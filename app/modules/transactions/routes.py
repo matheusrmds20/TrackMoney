@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.modules.transactions.schemas import TransactionCreate, TransactionResponse, TransactionUpdate
 from sqlalchemy.orm import Session
 from app.db.session import get_db
@@ -20,9 +20,15 @@ def create_tranaction_route(
     user: UserDB = Depends(get_current_user)    
 ):
 
-    transaction = create_transaction(db, user.id, data)
 
-    return transaction
+    try:
+        return create_transaction(db, user.id, data)
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro interno no servidor")
+    
 
 @router_transaction.get("/list")
 def list_transaction_route(
@@ -37,7 +43,15 @@ def list_transaction_route(
     print("TYPE:", type)
     print("CATEGORY:", category_id)
     
-    return list_transaction(db, user.id, limit, page, type, category_id)
+
+    try:
+        return list_transaction(db, user.id, limit, page, type, category_id)
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro interno no servidor")
+    
 
 @router_transaction.get("list/{transaction_id}")
 def list_transaction_id_route(
@@ -46,9 +60,13 @@ def list_transaction_id_route(
     user: UserDB = Depends(get_current_user)
 ):
     
+    try:
+        return list_transaction_id(db, user.id, transaction_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro interno no servidor")
     
-    return list_transaction_id(db, user.id, transaction_id)
-
 @router_transaction.patch("/update/{transaction_id}", response_model=TransactionResponse)
 def update_transaction_route(
     data: TransactionUpdate,
@@ -56,9 +74,13 @@ def update_transaction_route(
     db: Session = Depends(get_db),
     user: UserDB = Depends(get_current_user)
 ):
+    try:
+        return update_transaction(db, user.id, transaction_id, data)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro interno no servidor")
     
-    return update_transaction(db, user.id, transaction_id, data)
-
 @router_transaction.delete("/delete/{transaction_id}")
 def delete_transaction_route(
     transaction_id: int,
@@ -66,4 +88,9 @@ def delete_transaction_route(
     user: UserDB = Depends(get_current_user)
 ):
 
-    return delete_transaction(db, user.id, transaction_id)
+    try:
+        return delete_transaction(db, user.id, transaction_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro interno no servidor")
