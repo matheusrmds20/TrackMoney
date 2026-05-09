@@ -6,7 +6,7 @@ from app.db.models.user import UserDB
 from app.core.auth import get_current_user
 from fastapi import Depends
 from datetime import datetime
-from app.modules.transactions.service import create_transaction, list_transaction, list_transaction_id, update_transaction, delete_transaction
+from app.modules.transactions.service import TransactionService
 
 
 
@@ -16,25 +16,26 @@ router_transaction = APIRouter(prefix="/transactions", tags=["transactions"])
 @router_transaction.post("/", response_model=TransactionResponse)
 def create_tranaction_route(
     data: TransactionCreate,
-    db: Session = Depends(get_db),
-    user: UserDB = Depends(get_current_user)    
+    user: UserDB = Depends(get_current_user),
+    service: TransactionService = Depends()    
 ):
 
 
     try:
-        return create_transaction(db, user.id, data)
+        return service.create_transaction(user.id, data)
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception:
-        raise HTTPException(status_code=500, detail="Erro interno no servidor")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail= f"Erro interno no servidor {str(e)}")
+    
     
 
 @router_transaction.get("/list")
 def list_transaction_route(
     limit: int = 5,
     page: int = 1,
-    db: Session = Depends(get_db),
+    service: TransactionService = Depends(),
     user: UserDB = Depends(get_current_user),
     type: str | None = None,
     category_id: int | None = None,
@@ -45,52 +46,51 @@ def list_transaction_route(
     
 
     try:
-        return list_transaction(db, user.id, limit, page, type, category_id)
+        return service.list_transaction(user.id, limit, page, type, category_id)
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception:
-        raise HTTPException(status_code=500, detail="Erro interno no servidor")
-    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail= f"Erro interno no servidor {str(e)}")
 
 @router_transaction.get("list/{transaction_id}")
 def list_transaction_id_route(
     transaction_id: int,
-    db: Session = Depends(get_db),
+    service: TransactionService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
     
     try:
-        return list_transaction_id(db, user.id, transaction_id)
+        return service.list_transaction_id(user.id, transaction_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception:
-        raise HTTPException(status_code=500, detail="Erro interno no servidor")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail= f"Erro interno no servidor {str(e)}")
     
 @router_transaction.patch("/update/{transaction_id}", response_model=TransactionResponse)
 def update_transaction_route(
     data: TransactionUpdate,
     transaction_id: int,
-    db: Session = Depends(get_db),
+    service: TransactionService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
     try:
-        return update_transaction(db, user.id, transaction_id, data)
+        return service.update_transaction(user.id, transaction_id, data)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception:
-        raise HTTPException(status_code=500, detail="Erro interno no servidor")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail= f"Erro interno no servidor {str(e)}")
     
 @router_transaction.delete("/delete/{transaction_id}")
 def delete_transaction_route(
     transaction_id: int,
-    db: Session = Depends(get_db),
+    service: TransactionService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
 
     try:
-        return delete_transaction(db, user.id, transaction_id)
+        return service.delete_transaction(user.id, transaction_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception:
-        raise HTTPException(status_code=500, detail="Erro interno no servidor")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail= f"Erro interno no servidor {str(e)}")
