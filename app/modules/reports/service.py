@@ -3,109 +3,93 @@ from sqlalchemy import func, desc, extract
 from sqlalchemy.orm import Session
 from app.db.models.categories import CategoryDB
 from app.db.models.trasactions import TransactionsDB
-from fastapi import HTTPException
-
-def balance(db: Session, user_id: int, year, month):
-
-    if year < 2000 or year > 2100:
-        raise HTTPException(status_code=400, detail="Ano fora dos limites")
-    
-    if not 1 <= month <= 12:
-        raise HTTPException(status_code=400, detail="Mes invalido")
+from fastapi import HTTPException, Depends
+from app.db.session import get_db
+from app.repository.reports_repository import ReportsRepository
 
 
-    start = datetime(year,month, 1)
-    if month == 12:
-        end = datetime(year + 1 , 1, 1)
+class ReportService:
+    def __init__(self, db: Session = Depends(get_db)):
+        self.db = db
+        self.repository = ReportsRepository(db)
 
-    else:
-        end = datetime(year, month + 1, 1)
+    def balance(self, user_id: int, year: int, month: int):
 
-    transaction = db.query(
-        CategoryDB.type,
-        func.sum(TransactionsDB.value)
-    ).join(CategoryDB).filter(
-        TransactionsDB.user_id == user_id,
-        TransactionsDB.transaction_date >= start,
-        TransactionsDB.transaction_date < end
-    ).group_by(CategoryDB.type).all()
-
-
-    result = {"income": 0, "expense": 0}
-
-    for t_type, total in transaction:
-        if t_type.value in result:
-            result[t_type.value] = float(total or 0)
-
-    result["balance"] = round(result["income"] - result["expense"], 2)
-
-    return result
-
-
-def by_category(db: Session, user_id: int, year: int, month: int):
-
-    if year < 2000 or year > 2100:
-        raise HTTPException(status_code=400, detail="Ano fora dos limites")
-    
-    if not 1 <= month <= 12:
-        raise HTTPException(status_code=400, detail="Mes invalido")
+        if year < 2000 or year > 2100:
+            raise HTTPException(status_code=400, detail="Ano fora dos limites")
         
-    start = datetime(year, month, 1)
+        if not 1 <= month <= 12:
+            raise HTTPException(status_code=400, detail="Mes invalido")
+
+
+        start = datetime(year,month, 1)
+        if month == 12:
+            end = datetime(year + 1 , 1, 1)
+
+        else:
+            end = datetime(year, month + 1, 1)
+
+        transaction = self.repository.transactions(user_id, start, end)
+
+
+        result = {"income": 0, "expense": 0}
+
+        for t_type, total in transaction:
+            if t_type.value in result:
+                result[t_type.value] = float(total or 0)
+
+        result["balance"] = round(result["income"] - result["expense"], 2)
+
+        return result
+
+    def by_category(self, user_id: int, year: int, month: int):
+
+        if year < 2000 or year > 2100:
+            raise ValueError("Ano fora dos limites")
         
-    if month == 12:
-        end = datetime(year + 1, 1 ,1)
-    else:
-        end =  datetime(year, month + 1, 1)
+        if not 1 <= month <= 12:
+            raise ValueError(detail="Mes invalido")
+            
+        start = datetime(year, month, 1)
+            
+        if month == 12:
+            end = datetime(year + 1, 1 ,1)
+        else:
+            end =  datetime(year, month + 1, 1)
 
-    categoria = db.query(
-        CategoryDB.name,
-        func.sum(TransactionsDB.value)
-    ).join(
-            CategoryDB, TransactionsDB.category_id ==  CategoryDB.id
-        ).filter(
-            TransactionsDB.user_id == user_id,
-            TransactionsDB.transaction_date >= start,
-            TransactionsDB.transaction_date < end
-        ).group_by(CategoryDB.name).all()
-    
-    if not categoria:
-        raise HTTPException(status_code=404, detail="Categoria nao encontrada")
-    
-    return {name: float(total) for name, total in categoria}
+        category = self.repository.categorys(user_id, start, end)
+        
+        if not category:
+            raise ValueError("Nao ha gasto neste mes")
+        
+        return {name: float(total) for name, total in category}
 
-def monthly_report(db: Session, user_id: int, year: int, month: int):
-    balance_monthly = balance(db, user_id, year, month)
-    category_monthly = by_category(db, user_id, year, month)
+    def monthly_report(self, user_id: int, year: int, month: int):
+        balance_monthly = self.balance(user_id, year, month)
+        category_monthly = self.by_category(user_id, year, month)
+        
+        if not balance_monthly:
+            raise ValueError("Nao ha gasto neste mes")
 
-    return{
-        **balance_monthly,
-            "by_category": category_monthly
-    }
+        return{
+            **balance_monthly,
+                "by_category": category_monthly
+        }
 
-def top_expense(db: Session, user_id: int, year: int, month: int):
-    bigger_expense = db.query(TransactionsDB).filter(
-        TransactionsDB.user_id == user_id,
-        TransactionsDB.type == "expense",
-        extract("month", TransactionsDB.transaction_date) == month,
-        extract("year", TransactionsDB.transaction_date) == year
-    ).order_by(desc(TransactionsDB.value)).first()
+    def top_expense(self, user_id: int, year: int, month: int):
+        bigger_expense = self.repository.top_expense(user_id, month, year)
 
-    if not bigger_expense or None:
-        raise HTTPException(status_code=404, detail="Nao ha gasto neste mes")
+        if not bigger_expense or None:
+            raise HTTPException(status_code=404, detail="Nao ha gasto neste mes")
 
 
-    return bigger_expense
+        return bigger_expense
 
-def average_expense(db: Session, user_id: int, year: int, month: int):
-    average = db.query(func.avg(TransactionsDB.value)).filter(
-        TransactionsDB.type == 'expense',
-        TransactionsDB.user_id == user_id,
-        extract("month", TransactionsDB.transaction_date) == month,
-        extract("year", TransactionsDB.transaction_date) == year
-     ).scalar()
-    
-    if not average or None:
-        raise HTTPException(status_code=404, detail="Nao ha gasto neste mes")
+    def average_expense(self, user_id: int, year: int, month: int):
+        average = self.repository.the_average(user_id, month, year)
+        
+        if not average or None:
+            raise HTTPException(status_code=404, detail="Nao ha gasto neste mes")
 
-    
-    return {"mes" : month, "ano": year, "media" : round(average)}
+        
+        return {"mes" : month, "ano": year, "media" : round(average)}

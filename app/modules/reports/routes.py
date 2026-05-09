@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.auth import get_current_user
 from app.db.session import get_db
 from app.db.models.user import UserDB
-from app.modules.reports.service import balance, by_category, monthly_report, top_expense, average_expense
+from app.modules.reports.service import ReportService
 
 
 
@@ -14,53 +14,62 @@ router_reports = APIRouter(prefix="/report", tags=["report"])
 def list_balance(
     month: int,
     year: int,
-    db: Session = Depends(get_db),
+    service: ReportService = Depends(),
     user: UserDB =  Depends(get_current_user)
 ):
     
     try:
-        return balance(db, user.id, year, month)
-    except HTTPException as m:
-        raise m
-    except Exception as e:
-        print(f"Erro indesperado:{str(e)}")
-        raise HTTPException(status_code=500, detail="Erro interno no servidor")
+        return service.balance(user.id, year, month)
+    except ValueError as m:
+        raise HTTPException(status_code=400, detail=str(m))
+
 
 @router_reports.get("/by_category")
 def list_category(
     month: int,
     year: int,
-    db: Session = Depends(get_db),
+    service: ReportService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
-    
-    return by_category(db, user.id, year, month)
+    try:
+        return service.by_category(user.id, year, month)
+    except ValueError as m:
+        raise HTTPException(status_code=400, detail=str(m))
 
 @router_reports.get("/monthly_report")
 def list_monthly(
     month: int,
     year: int,
-    db: Session = Depends(get_db),
+    service: ReportService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
     
-    return monthly_report(db, user.id, year, month)
+    try:
+        return service.monthly_report(user.id, year, month)
+    except ValueError as m:
+        raise HTTPException(status_code=400, detail=str(m))
 
 @router_reports.get("/top")
 def list_top_expense(
     month: int,
     year: int,
-    db: Session = Depends(get_db),
+    service: ReportService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
     
-    return top_expense(db, user.id, year, month)
+    try:
+        return service.top_expense(user.id, year, month)
+    except ValueError as m:
+        raise HTTPException(status_code=400, detail=str(m))
 
 @router_reports.get("/average")
 def list_average(
     month: int,
     year: int,
-    db: Session = Depends(get_db),
+    service: ReportService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
-    return average_expense(db, user.id, year, month)
+    try:
+        return service.average_expense(user.id, year, month)
+    except ValueError as m:
+        raise HTTPException(status_code=400, detail=str(m))
