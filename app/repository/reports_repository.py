@@ -20,7 +20,6 @@ class ReportsRepository:
          
          return transaction
     
-
     def categorys(self, user_id: int, start, end):
         category = self.db.query(
             CategoryDB.name,

@@ -4,81 +4,64 @@ from sqlalchemy.exc import IntegrityError
 from app.db.models.categories import CategoryDB
 from fastapi import HTTPException
 from sqlalchemy import func
+from fastapi import Depends
+from app.db.session import get_db
+from app.repository.category_repository import CategoryRepository
+
+class CategoryService:
+    def __init__(self, db: Session = Depends(get_db)):
+        self.db = db
+        self.repository = CategoryRepository(db)
+
+    def create_category(self, data: CategoryCreate, user_id: int):
+        category_ja_existente = self.repository.category_exist(data.name, user_id)
+        
+        if category_ja_existente:
+            raise HTTPException(status_code=400, detail="Categoria ja existente")
+        
+        if not data.name or data.name.strip() == "":
+            raise HTTPException(status_code=400, detail="O name nao pode estar vazio")
+        
+        category = self.repository.create(user_id, data)
 
 
-
-def create_category(db: Session, data: CategoryCreate, user_id: int):
-    category_ja_existente = db.query(CategoryDB).filter(
-        func.lower(CategoryDB.name) == func.lower(data.name)
-).first()
-    
-    if category_ja_existente:
-        raise HTTPException(status_code=400, detail="Categoria ja existente")
-    
-    if not data.name or data.name.strip() == "":
-        raise HTTPException(status_code=400, detail="O name nao pode estar vazio")
-
-
-    category = CategoryDB(
-        name=data.name,
-        type=data.type,
-        user_id=user_id
-    )
-
-
-    try:
-        db.add(category)
-        db.commit()
-        db.refresh(category)
         return category
 
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(status_code=400, detail="Algo deu errado tente novamente")
 
-def list_all_category(db: Session, user_id: int):
+    def list_all_category(self, user_id: int):
 
-    listar = db.query(CategoryDB).filter(CategoryDB.user_id == user_id).all()
+        listar = self.repository.list_all_category(user_id)
 
-    return listar
+        return listar
 
 
-def update_category(db: Session, user_id: int, category_id: int, data: CategoryUpdate):
-    category = db.query(CategoryDB).filter(
-        CategoryDB.id == category_id
-).first()
+    def update_category(self, user_id: int, category_id: int, data: CategoryUpdate):
+        category = self.repository.category_id(user_id, category_id)
 
-    if not category:
-        raise HTTPException(status_code=404, detail="Category nao encontrada")
-    
-    if category.user_id != user_id:
-        raise HTTPException(status_code=403, detail="id da Category incorreta")
-    
-    try:
+        if not category:
+            raise HTTPException(status_code=404, detail="Category nao encontrada")
+        
+        if category.user_id != user_id:
+            raise HTTPException(status_code=403, detail="id da Category incorreta")
+        
+
         for field, value in data.model_dump(exclude_unset=True).items():
             setattr(category, field, value)
 
-        db.commit()
-        db.refresh(category)
-        return category
+        updated_category = self.repository.update(category)
+
+        return updated_category
+
+
+    def delete_category(self, user_id: int, category_id: int):
+        category = self.repository.category_id(user_id, category_id)
+
+        if not category:
+            raise HTTPException(status_code=404, detail="Category nao encontrada")
         
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(status_code=400, detail="Falha ao tentar atualizar category")
+        if category.user_id != user_id:
+            raise HTTPException(status_code=403, detail="id da Category incorreta")
+        
+        delete = self.repository.delete(user_id, category_id)
 
-
-def delete_category(db: Session, user_id: int, category_id: int):
-    category = db.query(CategoryDB).filter(
-        CategoryDB.id == category_id,
-        CategoryDB.user_id == user_id
-).first()
-
-    if not category:
-        raise HTTPException(status_code=404, detail="Category nao encontrada")
-    
-    if category.user_id != user_id:
-        raise HTTPException(status_code=403, detail="id da Category incorreta")
-    
-
-    db.delete(category)
-    db.commit()
+        return delete
