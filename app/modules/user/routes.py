@@ -16,9 +16,8 @@ def register_user(user_data: CreateUser, service: UserService = Depends()):
         return service._create(user_data)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    
-
-        raise HTTPException(status_code=500, detail="Erro interno no servidor")
+    except Exception as m:
+        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
 
 @router_user.post("/login")
 def authenticate(form_data: OAuth2PasswordRequestForm = Depends(), service: UserService = Depends()):
@@ -28,6 +27,8 @@ def authenticate(form_data: OAuth2PasswordRequestForm = Depends(), service: User
     
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as m:
+        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
 
 
 @router_user.delete("/delete_user")
@@ -41,5 +42,5 @@ def delete_user_URL(
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception:
-        raise HTTPException(status_code=500, detail="Erro interno no servidor")
+    except Exception as m:
+        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")

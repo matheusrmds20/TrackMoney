@@ -33,8 +33,10 @@ def list_category(
 ):
     try:
         return service.by_category(user.id, year, month)
-    except ValueError as m:
-        raise HTTPException(status_code=400, detail=str(m))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as m:
+        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
 
 @router_reports.get("/monthly_report")
 def list_monthly(
@@ -46,8 +48,10 @@ def list_monthly(
     
     try:
         return service.monthly_report(user.id, year, month)
-    except ValueError as m:
-        raise HTTPException(status_code=400, detail=str(m))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as m:
+        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
 
 @router_reports.get("/top")
 def list_top_expense(
@@ -59,8 +63,10 @@ def list_top_expense(
     
     try:
         return service.top_expense(user.id, year, month)
-    except ValueError as m:
-        raise HTTPException(status_code=400, detail=str(m))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as m:
+        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
 
 @router_reports.get("/average")
 def list_average(
@@ -71,5 +77,7 @@ def list_average(
 ):
     try:
         return service.average_expense(user.id, year, month)
-    except ValueError as m:
-        raise HTTPException(status_code=400, detail=str(m))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as m:
+        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
