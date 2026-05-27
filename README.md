@@ -1,4 +1,4 @@
-# FastAPI Auth API (JWT + CLI)
+# FastAPI Auth API (JWT)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![Pydantic](https://img.shields.io/badge/pydantic-%23E92063.svg?style=for-the-badge&logo=pydantic&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens) ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
 
@@ -62,6 +62,25 @@ FinanceApp/app
 git clone <https://github.com/matheusrmds20/FastAPI_FInanceiro>
 cd FastAPI_FInanceiro
 ```
+## 🐳 Infraestrutura com Docker
+
+O banco de dados da aplicação (PostgreSQL/MySQL) roda de forma isolada em um container Docker. 
+
+### Pré-requisitos
+* **Docker** e **Docker Compose** instalados na sua máquina.
+
+### Como subir o Banco de Dados
+Na raiz do projeto (onde está o arquivo `docker-compose.yml`), execute o comando abaixo para iniciar o banco de dados em segundo plano:
+
+```bash
+docker compose up -d
+```
+Se precisar parar o banco de dados e remover os containers, utilize:
+
+```
+docker compose down
+```
+
 ### 2️⃣ Criar ambiente virtual
 ```text
 python -m venv venv
@@ -101,6 +120,9 @@ Ao expirar, é necessário novo login
 
 🧪 Testes
 
+Os testes cobre tanto as regras de negócio puras (Services) quanto os endpoints de entrada
+Para rodar todos os testes executados pelo Pytest:
 
-
-
+```text
+python -m pytest
+```
