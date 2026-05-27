@@ -4,8 +4,6 @@
 
 ## Api RESTful para controle de financas pessoais com **FastAPI**, **SQLAlchemy** e autenticação com **JWT**. utilizando arquitetura modular, tratamento de exceções e testes automatizados.
 
-## ✨ Funcionalidades
-
 
 ## 🛠️ Tecnologias
 
