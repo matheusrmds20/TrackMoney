@@ -1,0 +1,23 @@
+# Arquivos de configuração local (Segurança)
+.env
+*.env
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+ENV/
+
+# Caches do Python e do Pytest
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDEs e Sistema Operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
