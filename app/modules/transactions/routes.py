@@ -19,14 +19,9 @@ def create_tranaction_route(
     user: UserDB = Depends(get_current_user),
     service: TransactionService = Depends()    
 ):
-    try:
-        return service.create_transaction(user.id, data)
 
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail= f"Erro interno no servidor {str(m)}")
-    
+    return service.create_transaction(user.id, data)
+
     
 
 @router_transaction.get("/list")
@@ -40,41 +35,30 @@ def list_transaction_route(
 ):
     
 
-    try:
-        return service.list_transaction(user.id, limit, page, type, category_id)
+    return service.list_transaction(user.id, limit, page, type, category_id)
 
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail= f"Erro interno no servidor {str(m)}")
 
-@router_transaction.get("list/{transaction_id}")
+
+@router_transaction.get("/list/{transaction_id}")
 def list_transaction_id_route(
     transaction_id: int,
     service: TransactionService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
     
-    try:
-        return service.list_transaction_id(user.id, transaction_id)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail= f"Erro interno no servidor {str(m)}")
+
+    return service.list_transaction_id(user.id, transaction_id)
+
     
-@router_transaction.patch("/update/{transaction_id}", response_model=TransactionResponse)
+@router_transaction.patch("/update/{transaction_id}", response_model=TransactionUpdate)
 def update_transaction_route(
     data: TransactionUpdate,
     transaction_id: int,
     service: TransactionService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
-    try:
-        return service.update_transaction(user.id, transaction_id, data)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
+    
+    return service.update_transaction(user.id, transaction_id, data)
     
 @router_transaction.delete("/delete/{transaction_id}")
 def delete_transaction_route(
@@ -83,9 +67,4 @@ def delete_transaction_route(
     user: UserDB = Depends(get_current_user)
 ):
 
-    try:
-        return service.delete_transaction(user.id, transaction_id)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail= f"Erro interno no servidor {str(m)}")
+    return service.delete_transaction(user.id, transaction_id)

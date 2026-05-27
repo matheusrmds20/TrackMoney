@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 from app.repository.transactions_repository import TransactionRepository
+from app.core.exceptions.base import *
 
 class TransactionService:
     def __init__(self, db: Session = Depends(get_db)):
@@ -83,7 +84,7 @@ class TransactionService:
         transactions = self.repository.user_id_all(user_id)
 
         if not transactions:
-            raise ValueError("Transacao nao econtrada")
+            raise ItemNaoEncontrado("Transacao nao encontrada")
 
         if limit > 100:
             raise ValueError("Limite muito alto")
@@ -94,7 +95,7 @@ class TransactionService:
             "page": page,
             "pages": (total + limit - 1) // limit,   
             "limit": limit,
-            "data": data
+            "items": data
         }
 
 
@@ -102,29 +103,26 @@ class TransactionService:
         transaction = self.repository.transaction_id_repo(user_id, transaction_id)
         
         if not transaction:
-            raise ValueError("Transacao nao encontrada")
+            raise ItemNaoEncontrado("Transacao nao encontrada")
         
         return transaction
 
 
     def update_transaction(self, user_id: int, transaction_id: int, data: TransactionUpdate):
+        
+        if not (transaction := self.repository.transaction_id_repo(user_id, transaction_id)):
+            raise ItemNaoEncontrado("Transacao nao encontrada")
+        
         transaction = self.repository.update_transaction_repo(user_id, transaction_id, data)
-
-        if not data.title or data.title.strip() == "":
-            raise ValueError("O titulo da transacao nao pode estar vazio")
-
-        if not transaction:
-            raise ValueError("Transacao nao encontrada")
 
         return transaction
 
 
     def delete_transaction(self, user_id:int, transaction_id: int):
-
-        transaction_exist = self.repository.transaction_id_repo(user_id, transaction_id)
+        print(f"\n--- SERVICE RECEBEU -> user_id: {user_id}, transaction_id: {transaction_id} ---")
         
-        if not transaction_exist:
-            raise ValueError("Transacao nao encontrada")
+        if not (transaction := self.repository.transaction_id_repo(user_id, transaction_id)):
+            raise ItemNaoEncontrado("Transacao nao encontrada")
 
         transaction = self.repository.delete_transaction_repo(user_id, transaction_id)
 
