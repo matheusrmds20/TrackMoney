@@ -116,7 +116,7 @@ Token possui tempo de expiração de 30 minutos
 
 Ao expirar, é necessário novo login
 
-🧪 Testes
+## 🧪 Testes
 
 Os testes cobre tanto as regras de negócio puras (Services) quanto os endpoints de entrada
 Para rodar todos os testes executados pelo Pytest:
