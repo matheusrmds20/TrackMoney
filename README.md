@@ -5,7 +5,7 @@
 ## Api RESTful para controle de financas pessoais com **FastAPI**, **SQLAlchemy** e autenticação com **JWT**. utilizando arquitetura modular, tratamento de exceções e testes automatizados.
 
 
-## 🛠️ Tecnologias
+## ⚙️ Tecnologias
 
 Python 3.13.2
 
@@ -104,7 +104,7 @@ uvicorn main:app --reload
 A API esta disponivel em: http://127.0.0.1:8000 .Para acessar a documentacao acesse http://127.0.0.1:8000/docs
 ```
 
-## Autenticação JWT
+## 🔒 Autenticação JWT
 
 Access Token gerado no login
 
