@@ -17,11 +17,9 @@ def list_balance(
     service: ReportService = Depends(),
     user: UserDB =  Depends(get_current_user)
 ):
-    
-    try:
-        return service.balance(user.id, year, month)
-    except ValueError as m:
-        raise HTTPException(status_code=400, detail=str(m))
+
+    return service.balance(user.id, year, month)
+
 
 
 @router_reports.get("/by_category")
@@ -31,12 +29,9 @@ def list_category(
     service: ReportService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
-    try:
-        return service.by_category(user.id, year, month)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
+
+    return service.by_category(user.id, year, month)
+
 
 @router_reports.get("/monthly_report")
 def list_monthly(
@@ -46,12 +41,9 @@ def list_monthly(
     user: UserDB = Depends(get_current_user)
 ):
     
-    try:
-        return service.monthly_report(user.id, year, month)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
+
+    return service.monthly_report(user.id, year, month)
+
 
 @router_reports.get("/top")
 def list_top_expense(
@@ -61,12 +53,8 @@ def list_top_expense(
     user: UserDB = Depends(get_current_user)
 ):
     
-    try:
-        return service.top_expense(user.id, year, month)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
+
+    return service.top_expense(user.id, year, month)
 
 @router_reports.get("/average")
 def list_average(
@@ -75,9 +63,5 @@ def list_average(
     service: ReportService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
-    try:
-        return service.average_expense(user.id, year, month)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
+
+    return service.average_expense(user.id, year, month)

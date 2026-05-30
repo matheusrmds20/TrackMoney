@@ -1,12 +1,13 @@
 from app.modules.categories.schema import CategoryCreate, CategoryUpdate
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from app.db.models.categories import CategoryDB
+from app.db.models.categories import CategoryType
 from fastapi import HTTPException
 from sqlalchemy import func
 from fastapi import Depends
 from app.db.session import get_db
 from app.repository.category_repository import CategoryRepository
+from app.core.exceptions.base import *
 
 class CategoryService:
     def __init__(self, db: Session = Depends(get_db)):
@@ -17,10 +18,10 @@ class CategoryService:
         category_ja_existente = self.repository.category_exist(data.name, user_id)
         
         if category_ja_existente:
-            raise HTTPException(status_code=400, detail="Categoria ja existente")
+            raise ValueError("Categoria ja existente")
         
         if not data.name or data.name.strip() == "":
-            raise HTTPException(status_code=400, detail="O name nao pode estar vazio")
+            raise ValueError("O name nao pode estar vazio")
         
         category = self.repository.create(user_id, data)
 
@@ -39,11 +40,10 @@ class CategoryService:
         category = self.repository.category_id(user_id, category_id)
 
         if not category:
-            raise HTTPException(status_code=404, detail="Category nao encontrada")
-        
-        if category.user_id != user_id:
-            raise HTTPException(status_code=403, detail="id da Category incorreta")
-        
+            raise ItemNaoEncontrado("Categoria nao encontrada")
+
+        if data.type not in CategoryType:
+            raise ValueError("Nenhuma categoria encontra")
 
         for field, value in data.model_dump(exclude_unset=True).items():
             setattr(category, field, value)
@@ -57,10 +57,7 @@ class CategoryService:
         category = self.repository.category_id(user_id, category_id)
 
         if not category:
-            raise HTTPException(status_code=404, detail="Category nao encontrada")
-        
-        if category.user_id != user_id:
-            raise HTTPException(status_code=403, detail="id da Category incorreta")
+            raise ItemNaoEncontrado("Categoria nao encontrada")
         
         delete = self.repository.delete(user_id, category_id)
 

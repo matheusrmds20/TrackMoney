@@ -10,13 +10,13 @@ class ReportsRepository:
     def transactions(self, user_id: int, start, end):
          
          transaction = self.db.query(
-            CategoryDB.type,
+            TransactionsDB.type,
             func.sum(TransactionsDB.value)
         ).join(CategoryDB).filter(
             TransactionsDB.user_id == user_id,
             TransactionsDB.transaction_date >= start,
             TransactionsDB.transaction_date < end
-        ).group_by(CategoryDB.type).all()
+        ).group_by(TransactionsDB.type).all()
          
          return transaction
     

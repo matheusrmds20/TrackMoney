@@ -19,25 +19,16 @@ def create_category_route(
     user: UserDB = Depends(get_current_user)
     
 ):
-    
-    try:
-        return service.create_category(data, user.id)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
+    return service.create_category(data, user.id)
+
 
 @router_category.get("/", response_model=list[CategoryResponse])
 def list_category_route(
         service: CategoryService = Depends(),
         user: UserDB = Depends(get_current_user)
 ):
-    try:
-        return service.list_all_category(user.id)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
+     return service.list_all_category(user.id)
+
 
 
 @router_category.patch("/update/{category_id}")
@@ -48,12 +39,8 @@ def update_category_route(
     user: UserDB = Depends(get_current_user)
 
 ):
-    try:
-        return service.update_category(user.id, category_id, data)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
+    return service.update_category(user.id, category_id, data)
+
 
 @router_category.delete("/delete/{category_id}")
 def delete_category_route(
@@ -62,9 +49,5 @@ def delete_category_route(
     user: UserDB = Depends(get_current_user)
 ):
 
-    try:   
-        return service.delete_category(user.id, category_id)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as m:
-        raise HTTPException(status_code=500, detail=f"Erro interno no servidor {str(m)}")
+
+    return service.delete_category(user.id, category_id)

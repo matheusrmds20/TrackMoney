@@ -16,10 +16,10 @@ class ReportService:
     def balance(self, user_id: int, year: int, month: int):
 
         if year < 2000 or year > 2100:
-            raise HTTPException(status_code=400, detail="Ano fora dos limites")
+            raise ValueError("Ano fora dos limites")
         
         if not 1 <= month <= 12:
-            raise HTTPException(status_code=400, detail="Mes invalido")
+            raise ValueError("Mes invalido")
 
 
         start = datetime(year,month, 1)
@@ -31,12 +31,18 @@ class ReportService:
 
         transaction = self.repository.transactions(user_id, start, end)
 
+        print("Retorno do repositório:", transaction)
+
 
         result = {"income": 0, "expense": 0}
 
         for t_type, total in transaction:
-            if t_type.value in result:
-                result[t_type.value] = float(total or 0)
+
+            type_str = str(t_type.value if hasattr(t_type, "value") else t_type)
+            type_str = type_str.lower()
+
+            if type_str in result:
+                result[type_str] = float(total or 0)    
 
         result["balance"] = round(result["income"] - result["expense"], 2)
 
@@ -89,7 +95,7 @@ class ReportService:
         average = self.repository.the_average(user_id, month, year)
         
         if not average or None:
-            raise HTTPException(status_code=404, detail="Nao ha gasto neste mes")
+            raise ValueError("Nao ha gasto neste mes")
 
         
         return {"mes" : month, "ano": year, "media" : round(average)}

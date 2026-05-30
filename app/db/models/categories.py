@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, Column, ForeignKey, UniqueConstraint, Enum
+from sqlalchemy import Integer, String, Column, ForeignKey, UniqueConstraint, Enum, Boolean
 from app.db.session import Base
 from enum import Enum as PyEnum
 
@@ -17,5 +17,6 @@ class CategoryDB(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
+    is_activated = Column(Boolean, default=True)
     type = Column(Enum(CategoryType, name="category_type"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"))

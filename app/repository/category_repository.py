@@ -35,7 +35,10 @@ class CategoryRepository:
         return category
     
     def list_all_category(self, user_id: int):
-        category = self.db.query(CategoryDB).filter(CategoryDB.user_id == user_id).all()
+        category = self.db.query(CategoryDB).filter(
+            CategoryDB.user_id == user_id,
+            CategoryDB.is_activated  == True
+).all()
 
         return category
     
@@ -61,7 +64,7 @@ class CategoryRepository:
         category = self.category_id(user_id, category_id)
 
         try:
-            self.db.delete(category)
+            category.is_activated = False
             self.db.commit()
         except IntegrityError as e:
             self.db.rollback()

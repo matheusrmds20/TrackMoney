@@ -1,4 +1,5 @@
 # Arquivos de configuração local (Segurança)
+env
 .env
 *.env
 

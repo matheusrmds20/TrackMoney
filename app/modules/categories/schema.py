@@ -1,7 +1,7 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 class CategoryBase(BaseModel):
-    name: str
+    name: str = Field(min_length=1, max_length=100)
     type: str
 
 class CategoryCreate(CategoryBase):
@@ -9,7 +9,7 @@ class CategoryCreate(CategoryBase):
 
 
 class CategoryUpdate(BaseModel):
-    name: str
+    name: str = Field(min_length=1, max_length=100)
     type: str
 
 class CategoryResponse(BaseModel):

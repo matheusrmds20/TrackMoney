@@ -113,6 +113,9 @@ class TransactionService:
         if not (transaction := self.repository.transaction_id_repo(user_id, transaction_id)):
             raise ItemNaoEncontrado("Transacao nao encontrada")
         
+        if not data.category_id:
+            raise ValueError("Precisa estar conectado a uma categoria")
+
         transaction = self.repository.update_transaction_repo(user_id, transaction_id, data)
 
         return transaction
