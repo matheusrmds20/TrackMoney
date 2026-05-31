@@ -14,16 +14,6 @@ Authorization: Bearer <token>
 ```
 Token possui tempo de expiração de 30 minutos
 
-Ao expirar, é necessário novo login## 🔒 Autenticação JWT
-
-Access Token gerado no login
-
-Enviado no header:
-```text
-Authorization: Bearer <token>
-```
-Token possui tempo de expiração de 30 minutos
-
 Ao expirar, é necessário novo login
 
 ## 🐳 Infraestrutura com Docker
@@ -33,21 +23,9 @@ O banco de dados da aplicação (PostgreSQL/MySQL) roda de forma isolada em um c
 ### Pré-requisitos
 * **Docker** e **Docker Compose** instalados na sua máquina.
 
-### Como subir o Banco de Dados
-Na raiz do projeto (onde está o arquivo `docker-compose.yml`), execute o comando abaixo para iniciar o banco de dados em segundo plano:
-
-```
-docker compose up -d
-```
-Se precisar parar o banco de dados e remover os containers, utilize:
-
-```
-docker compose down
-```
-
 ## ⚙️ Tecnologias
 
-Python
+Python 3.13.2+
 
 FastAPI
 
@@ -59,10 +37,6 @@ JWT
 
 Pytest
 
-## ⚙️ Requisitos
-Python 3.13.2+
-
-Docker
 
 ## Estrutura do projeto
 
