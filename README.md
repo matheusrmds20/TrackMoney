@@ -106,8 +106,7 @@ copy .env.example .env
 cp .env.example .env
 
 ```
-Preencha o arquivo .env gerado com a sua DATABASE_URL e SECRET_KEY.
-
+Preencha o arquivo .env gerado com a sua DATABASE_URL(opcional) e SECRET_KEY.
 
 
 ### 4️⃣ Instalar dependências
