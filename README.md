@@ -98,7 +98,7 @@ venv\Scripts\activate
 ### 3️⃣ Configurar variaveis de ambiente
 Copie o arquivo de exemplo e preencha com as suas configurações locais:
 
-# Codigo para criar o arquivo .env
+#### Codigo para criar o arquivo .env
 
 ```
 copy .env.example .env
