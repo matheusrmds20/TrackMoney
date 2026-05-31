@@ -89,17 +89,22 @@ python -m venv venv
 
 Depois ative o ambiente
 # No Linux/macOS:
-source .venv/bin/activate
+source venv/bin/activate
 
-# Windows
+# Windows(CMD)
 venv\Scripts\activate
 
 ```
 ### 3️⃣ Configurar variaveis de ambiente
 #### Codigo para criar o arquivo .env
 
-```
+```bash
+# Windows(CMD)
 copy .env.example .env
+
+# Linux/macOS/PowerShell
+cp .env.example .env
+
 ```
 Preencha o arquivo .env gerado com a sua DATABASE_URL e SECRET_KEY.
 
@@ -114,12 +119,12 @@ pip install -r requirements.txt
 ### 5️ Subir o Banco de Dados
 Na raiz do projeto (onde está o arquivo `docker-compose.yml`), execute o comando abaixo para iniciar o banco de dados em segundo plano:
 
-```
+```bash
 docker compose up -d
 ```
 Se precisar parar o banco de dados e remover os containers, utilize:
 
-```
+```bash
 docker compose down
 ```
 
