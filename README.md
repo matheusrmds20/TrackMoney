@@ -2,7 +2,7 @@
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![Pydantic](https://img.shields.io/badge/pydantic-%23E92063.svg?style=for-the-badge&logo=pydantic&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens) ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
 
-## Api RESTful para controle de financas pessoais com **FastAPI**, **SQLAlchemy** e autenticação com **JWT**. utilizando arquitetura modular, tratamento de exceções e testes automatizados.
+## Api RESTful para controle de financas pessoais com **FastAPI**, **SQLAlchemy** e autenticação com **JWT**. Utilizando arquitetura modular, tratamento de exceções e testes automatizados.
 
 ## 🔒 Autenticação JWT
 
