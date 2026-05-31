@@ -98,9 +98,9 @@ venv\Scripts\activate
 ### 3️⃣ Configurar variaveis de ambiente
 Copie o arquivo de exemplo e preencha com as suas configurações locais:
 
-```
-codigo para criar o aquivo .env
+# Codigo para criar o arquivo .env
 
+```
 copy .env.example .env
 ```
 E preencha o arquivo .env gerado com a sua DATABASE_URL e SECRET_KEY.
