@@ -88,7 +88,7 @@ Primeiro crie o ambiente
 python -m venv venv
 
 Depois ative o ambiente
-# No Linux/macOS:
+# Linux/macOS/PowerShell
 source venv/bin/activate
 
 # Windows(CMD)
