@@ -101,7 +101,9 @@ venv\Scripts\activate
 ```
 copy .env.example .env
 ```
-E preencha o arquivo .env gerado com a sua DATABASE_URL e SECRET_KEY.
+Preencha o arquivo .env gerado com a sua DATABASE_URL e SECRET_KEY.
+
+
 
 ### 4️⃣ Instalar dependências
 ```text
