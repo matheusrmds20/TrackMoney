@@ -4,10 +4,50 @@
 
 ## Api RESTful para controle de financas pessoais com **FastAPI**, **SQLAlchemy** e autenticação com **JWT**. utilizando arquitetura modular, tratamento de exceções e testes automatizados.
 
+## 🔒 Autenticação JWT
+
+Access Token gerado no login
+
+Enviado no header:
+```text
+Authorization: Bearer <token>
+```
+Token possui tempo de expiração de 30 minutos
+
+Ao expirar, é necessário novo login## 🔒 Autenticação JWT
+
+Access Token gerado no login
+
+Enviado no header:
+```text
+Authorization: Bearer <token>
+```
+Token possui tempo de expiração de 30 minutos
+
+Ao expirar, é necessário novo login
+
+## 🐳 Infraestrutura com Docker
+
+O banco de dados da aplicação (PostgreSQL/MySQL) roda de forma isolada em um container Docker. 
+
+### Pré-requisitos
+* **Docker** e **Docker Compose** instalados na sua máquina.
+
+### Como subir o Banco de Dados
+Na raiz do projeto (onde está o arquivo `docker-compose.yml`), execute o comando abaixo para iniciar o banco de dados em segundo plano:
+
+```
+docker compose up -d
+```
+Se precisar parar o banco de dados e remover os containers, utilize:
+
+```
+docker compose down
+```
 
 ## ⚙️ Tecnologias
 
-Python 3.13.2
+Python
 
 FastAPI
 
@@ -18,6 +58,12 @@ Pydantic
 JWT
 
 Pytest
+
+## ⚙️ Requisitos
+Python 3.13.2+
+
+Docker
+
 ## Estrutura do projeto
 
 ```text
@@ -57,20 +103,44 @@ FinanceApp/app
 
 ### 1️⃣ Clonar o repositório
 ```text
-git clone <https://github.com/matheusrmds20/FastAPI_FInanceiro>
+git clone https://github.com/matheusrmds20/FastAPI_FInanceiro
 cd FastAPI_FInanceiro
 ```
-## 🐳 Infraestrutura com Docker
 
-O banco de dados da aplicação (PostgreSQL/MySQL) roda de forma isolada em um container Docker. 
+### 2️⃣ Criar ambiente virtual
+```text
 
-### Pré-requisitos
-* **Docker** e **Docker Compose** instalados na sua máquina.
+Primeiro crie o ambiente
+python -m venv venv
 
-### Como subir o Banco de Dados
+Depois ative o ambiente
+# No Linux/macOS:
+source .venv/bin/activate
+
+# Windows
+venv\Scripts\activate
+
+```
+### 3️⃣ Configurar variaveis de ambiente
+Copie o arquivo de exemplo e preencha com as suas configurações locais:
+
+```
+codigo para criar o aquivo .env
+
+copy .env.example .env
+```
+E preencha o arquivo .env gerado com a sua DATABASE_URL e SECRET_KEY.
+
+### 4️⃣ Instalar dependências
+```text
+pip install -r requirements.txt
+
+```
+
+### 5️ Subir o Banco de Dados
 Na raiz do projeto (onde está o arquivo `docker-compose.yml`), execute o comando abaixo para iniciar o banco de dados em segundo plano:
 
-```bash
+```
 docker compose up -d
 ```
 Se precisar parar o banco de dados e remover os containers, utilize:
@@ -79,42 +149,15 @@ Se precisar parar o banco de dados e remover os containers, utilize:
 docker compose down
 ```
 
-### 2️⃣ Criar ambiente virtual
+### 6️⃣ Rodar a API
 ```text
-python -m venv venv
-
-# No Linux/macOS:
-source .venv/bin/activate
-
-# Windows
-venv\Scripts\activate
-
-```
-### 3️⃣ Instalar dependências
-```text
-pip install -r requirements.txt
-```
-### 4️⃣ Rodar a API
-```text
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 ### acesse:
 
 ```text
-A API esta disponivel em: http://127.0.0.1:8000 .Para acessar a documentacao acesse http://127.0.0.1:8000/docs
+A API esta disponivel em: http://127.0.0.1:8000. Para acessar a documentacao acesse http://127.0.0.1:8000/docs
 ```
-
-## 🔒 Autenticação JWT
-
-Access Token gerado no login
-
-Enviado no header:
-```text
-Authorization: Bearer <token>
-```
-Token possui tempo de expiração de 30 minutos
-
-Ao expirar, é necessário novo login
 
 ## 🧪 Testes
 
