@@ -80,7 +80,7 @@ def delete_transaction_route(
     return service.delete_transaction(user.id, transaction_id)
 
 @router_transaction.get("/expense_month")
-def delete_transaction_route(
+def expense_month_route(
     month: int,
     year: int,
     service: TransactionService = Depends(),
@@ -90,7 +90,7 @@ def delete_transaction_route(
     return service.expense_month(user.id, month, year)
 
 @router_transaction.get("/income_month")
-def delete_transaction_route(
+def income_month_route(
     month: int,
     year: int,
     service: TransactionService = Depends(),
