@@ -108,21 +108,33 @@ class TransactionService:
         return transaction
 
 
+    def monthly_transaction(self, user_id: int, month: int, year: int):
+        start = datetime(year,month, 1)
+        if month == 12:
+            end = datetime(year + 1 , 1, 1)
+
+        else:
+            end = datetime(year, month + 1, 1)
+
+        if not (monthly_transactions := self.repository.monthly_transactions_repo(user_id, start, end)):
+            raise ItemNaoEncontrado("Transacao nao encontrada")
+
+        return monthly_transactions
+
     def update_transaction(self, user_id: int, transaction_id: int, data: TransactionUpdate):
         
         if not (transaction := self.repository.transaction_id_repo(user_id, transaction_id)):
             raise ItemNaoEncontrado("Transacao nao encontrada")
         
         if not data.category_id:
-            raise ValueError("Precisa estar conectado a uma categoria")
+            raise ValueError("Transacao Precisa estar conectado a uma categoria")
 
         transaction = self.repository.update_transaction_repo(user_id, transaction_id, data)
 
         return transaction
-
+    
 
     def delete_transaction(self, user_id:int, transaction_id: int):
-        print(f"\n--- SERVICE RECEBEU -> user_id: {user_id}, transaction_id: {transaction_id} ---")
         
         if not (transaction := self.repository.transaction_id_repo(user_id, transaction_id)):
             raise ItemNaoEncontrado("Transacao nao encontrada")
@@ -130,3 +142,34 @@ class TransactionService:
         transaction = self.repository.delete_transaction_repo(user_id, transaction_id)
 
         return transaction
+
+
+    def expense_month(self, user_id: int, month: int, year: int):
+        start = datetime(year,month, 1)
+        if month == 12:
+            end = datetime(year + 1 , 1, 1)
+
+        else:
+            end = datetime(year, month + 1, 1)
+
+
+        if not (transactions := self.repository.expense_month_repo(user_id, start, end)):
+            raise ItemNaoEncontrado("Transacao nao encontrada")
+
+        return transactions
+    
+    def income_month(self, user_id: int, month: int, year: int):
+        start = datetime(year,month, 1)
+        if month == 12:
+            end = datetime(year + 1 , 1, 1)
+
+        else:
+            end = datetime(year, month + 1, 1)
+
+
+        if not (transactions := self.repository.income_month_repo(user_id, start, end)):
+            raise ItemNaoEncontrado("Transacao nao encontrada")
+
+        return transactions
+        
+        

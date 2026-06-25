@@ -6,6 +6,7 @@ from app.modules.categories.routes import router_category
 from app.modules.transactions.routes import router_transaction
 from app.modules.reports.routes import router_reports
 from app.core.exceptions.base import *
+from fastapi.middleware.cors import CORSMiddleware
 
 
 Base.metadata.create_all(bind=engine)
@@ -13,6 +14,20 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+origins = [
+    "http://localhost",
+    "http://127.0.0.1",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(router_user)
 app.include_router(router_category)

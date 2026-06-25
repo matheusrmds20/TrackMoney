@@ -12,7 +12,7 @@ router_category = APIRouter(prefix="/category", tags=["category"])
 
 
 
-@router_category.post("/", response_model=CategoryResponse)
+@router_category.post("/create", response_model=CategoryResponse)
 def create_category_route(
     data: CategoryCreate,
     service: CategoryService = Depends(), 
@@ -22,7 +22,7 @@ def create_category_route(
     return service.create_category(data, user.id)
 
 
-@router_category.get("/", response_model=list[CategoryResponse])
+@router_category.get("/list", response_model=list[CategoryResponse])
 def list_category_route(
         service: CategoryService = Depends(),
         user: UserDB = Depends(get_current_user)
@@ -48,6 +48,5 @@ def delete_category_route(
     service: CategoryService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
-
 
     return service.delete_category(user.id, category_id)

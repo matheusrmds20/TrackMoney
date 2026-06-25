@@ -5,4 +5,4 @@ class ItemNaoEncontrado(Exception):
 
 class NaoAutenticado(Exception):
     """Exceção para usuario não autenticado"""
-    pass    
+    pass

@@ -23,6 +23,10 @@ class CategoryService:
         if not data.name or data.name.strip() == "":
             raise ValueError("O name nao pode estar vazio")
         
+        if data.type not in CategoryType:
+            raise ValueError("Tipo nao aceito")
+        
+        
         category = self.repository.create(user_id, data)
 
 

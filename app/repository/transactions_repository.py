@@ -1,4 +1,4 @@
-from app.db.models.trasactions import TransactionsDB
+from app.db.models.trasactions import TransactionsDB, TransactionType
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
@@ -92,3 +92,34 @@ class TransactionRepository:
         except IntegrityError as e:
             self.db.rollback()
             raise e
+
+    def monthly_transactions_repo(self, user_id: int, start, end):
+        transactions = self.db.query(TransactionsDB).filter(
+            TransactionsDB.user_id == user_id,
+            TransactionsDB.transaction_date >= start,
+            TransactionsDB.transaction_date < end
+        ).group_by(TransactionsDB).all()
+
+        return transactions
+    
+    def expense_month_repo(self, user_id: int, start, end):
+        transactions = self.db.query(TransactionsDB).filter(
+            TransactionsDB.user_id == user_id,
+            TransactionsDB.type == TransactionType.expense,
+            TransactionsDB.transaction_date >= start,
+            TransactionsDB.transaction_date < end
+        ).all()
+
+        return transactions
+    
+    def income_month_repo(self, user_id: int, start, end):
+        transactions = self.db.query(TransactionsDB).filter(
+            TransactionsDB.user_id == user_id,
+            TransactionsDB.type == TransactionType.income,
+            TransactionsDB.transaction_date >= start,
+            TransactionsDB.transaction_date < end
+        ).all()
+
+        return transactions
+
+    

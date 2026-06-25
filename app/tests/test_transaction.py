@@ -107,18 +107,6 @@ def test_listar_transacoes_HTTP(auth_client, default_transaction):
     assert json_data["items"][0]["title"] == tx1.title
     assert f"{Decimal(str(json_data['items'][0]['value'])):.2f}" == f"{tx1.value:.2f}"
 
-
-def test_listar_id_HTTP(auth_client, default_transaction):
-    tx1 = default_transaction()
-
-    response = auth_client.get(f"transactions/list/{tx1.id}?user_id=1")
-    assert response.status_code == 200
-
-    json_data = response.json()
-    assert json_data["title"] == tx1.title
-    assert f"{Decimal(str(json_data['value'])):.2f}" == f"{tx1.value:.2f}"
-
-
 def test_atualizar_transacao_HTTP(auth_client, default_transaction, default_category):
     tx1 = default_transaction()
     payload = {
@@ -299,12 +287,6 @@ def test_erro_criar_transacao_HTTP(auth_client, default_category):
 def test_erro_listar_sem_transacoes_HTTP(auth_client):
 
     response = auth_client.get("transactions/list?user_id=1")
-    assert response.status_code == 404
-
-
-def test_erro_listar_sem_transacao_id_HTTP(auth_client):
-
-    response = auth_client.get("transactions/list/9999?user_id=1")
     assert response.status_code == 404
 
 

@@ -41,15 +41,25 @@ def list_transaction_route(
 
 @router_transaction.get("/list/{transaction_id}")
 def list_transaction_id_route(
-    transaction_id: int,
+    month: int,
+    year: int,
     service: TransactionService = Depends(),
     user: UserDB = Depends(get_current_user)
 ):
     
 
-    return service.list_transaction_id(user.id, transaction_id)
+    return service.list_transaction_id(user.id, month, year)
 
-    
+@router_transaction.get("/monthly_transactions")
+def monthly_transactions_route(
+    month: int,
+    year: int,
+    service: TransactionService = Depends(),
+    user: UserDB = Depends(get_current_user)
+):
+
+    return service.monthly_transaction(user.id, month, year)
+
 @router_transaction.patch("/update/{transaction_id}", response_model=TransactionUpdate)
 def update_transaction_route(
     data: TransactionUpdate,
@@ -68,3 +78,25 @@ def delete_transaction_route(
 ):
 
     return service.delete_transaction(user.id, transaction_id)
+
+@router_transaction.get("/expense_month")
+def delete_transaction_route(
+    month: int,
+    year: int,
+    service: TransactionService = Depends(),
+    user: UserDB = Depends(get_current_user)
+):
+
+    return service.expense_month(user.id, month, year)
+
+@router_transaction.get("/income_month")
+def delete_transaction_route(
+    month: int,
+    year: int,
+    service: TransactionService = Depends(),
+    user: UserDB = Depends(get_current_user)
+):
+
+    return service.income_month(user.id, month, year)
+
+
