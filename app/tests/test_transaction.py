@@ -1,10 +1,9 @@
 import pytest
 from decimal import Decimal
-from app.main import app
 from app.db.models.trasactions import TransactionsDB
 from app.modules.transactions.service import TransactionService
 from app.modules.transactions.schemas import TransactionUpdate
-from app.core.exceptions.base import *
+from app.core.exceptions.base import ItemNaoEncontrado
 
 # ----------------------------------------------------------------------
 #  TESTES DE FUNCIONAMENTO (SERVICE)

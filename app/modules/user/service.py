@@ -1,11 +1,7 @@
-from app.modules.user. schemas import CreateUser, LoginUser
+from app.modules.user. schemas import CreateUser
 from sqlalchemy.orm import Session
-from sqlalchemy import func
-from app.db.models.user import UserDB
-from app.core.security import hash_password, verify_password, create_token
-from app.modules.user.schemas import CreateUser, LoginUser
-from sqlalchemy.exc import IntegrityError
-from fastapi import HTTPException, Depends
+from app.core.security import verify_password, create_token
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from app.repository.user_repository import UserRepository
 from app.db.session import get_db

@@ -5,7 +5,7 @@ from app.modules.user.routes import router_user
 from app.modules.categories.routes import router_category
 from app.modules.transactions.routes import router_transaction
 from app.modules.reports.routes import router_reports
-from app.core.exceptions.base import *
+from app.core.exceptions.base import ItemNaoEncontrado
 from fastapi.middleware.cors import CORSMiddleware
 
 

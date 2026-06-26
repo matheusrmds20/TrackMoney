@@ -1,5 +1,4 @@
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -7,7 +6,7 @@ from app.main import app
 from app.db.session import get_db, Base
 from app.db.models.trasactions import TransactionsDB
 from app.core.auth import get_current_user
-from app.modules.transactions.service import TransactionService
+
 
 
 
@@ -73,7 +72,6 @@ def auth_client(client):
 @pytest.fixture()
 def default_transaction(db_session, default_category):
     def _create(title="Teste", value=100, type="income", user_id=1, category_id= default_category.id):
-        service_t = TransactionService(db_session)
         tx = TransactionsDB(
             title = title,
             value = value,

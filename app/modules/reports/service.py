@@ -1,8 +1,5 @@
 from datetime import datetime
-from sqlalchemy import func, desc, extract
 from sqlalchemy.orm import Session
-from app.db.models.categories import CategoryDB
-from app.db.models.trasactions import TransactionsDB
 from fastapi import HTTPException, Depends
 from app.db.session import get_db
 from app.repository.reports_repository import ReportsRepository

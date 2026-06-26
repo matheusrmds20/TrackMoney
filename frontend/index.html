@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinanceApp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="auth-view" class="view active">
+  <div class="auth-left">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+        </svg>
+      </div>
+      <span class="brand-name">FinanceApp</span>
+    </div>
+
+    <div class="auth-hero">
+      <h1>Controle<br>suas finanças<br><span>com clareza.</span></h1>
+      <p>Categorize, registre transações e acompanhe relatórios em um só lugar.</p>
+      <div class="feature-pills">
+        <div class="pill pill-cyan">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+          </svg>
+          Categorias
+        </div>
+        <div class="pill pill-green">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+          </svg>
+          Transações
+        </div>
+        <div class="pill pill-gold">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          Relatórios
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-form-wrap fade-enter" id="form-wrap">
+      <div class="auth-tabs">
+        <div class="tab-item" onclick="switchTab('login')">
+          <button class="tab-btn active" id="tab-btn-login">Login</button>
+          <div class="tab-line active" id="tab-line-login"></div>
+        </div>
+        <div class="tab-item" onclick="switchTab('register')">
+          <button class="tab-btn" id="tab-btn-register">Cadastro</button>
+          <div class="tab-line" id="tab-line-register"></div>
+        </div>
+      </div>
+
+      <div id="login-form">
+        <p class="form-title">Acesse sua conta</p>
+        <p class="form-sub">Insira suas credenciais para continuar</p>
+
+        <div class="field">
+          <label>E-mail</label>
+          <input type="text" id="login-email" placeholder="seuemail@exemplo.com" />
+        </div>
+
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" id="login-password" placeholder="••••••••" />
+          <button class="eye-btn" onclick="toggleEye('login-password', this)" tabindex="-1">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="status-msg" id="login-status"></div>
+
+        <button class="btn-primary cyan" onclick="doLogin()">
+          Entrar
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="register-form" style="display:none">
+        <p class="form-title">Crie sua conta</p>
+        <p class="form-sub">Preencha os dados abaixo para se registrar</p>
+
+        <div class="field">
+          <label>E-mail</label>
+          <input type="email" id="reg-email" placeholder="seuemail@exemplo.com" />
+        </div>
+
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" id="reg-password" placeholder="••••••••" />
+          <button class="eye-btn" onclick="toggleEye('reg-password', this)" tabindex="-1">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="field">
+          <label>Confirmar senha</label>
+          <input type="password" id="reg-confirm" placeholder="••••••••" />
+          <button class="eye-btn" onclick="toggleEye('reg-confirm', this)" tabindex="-1">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="status-msg" id="reg-status"></div>
+
+        <button class="btn-primary green" onclick="doRegister()">
+          Criar conta
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="dashboard-view" class="view" style="display:none;">
+  <div class="topbar">
+    <div class="brand-icon">
+      <svg fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+      </svg>
+    </div>
+    <div>
+      <div class="topbar-name">FinanceApp</div>
+      <div class="topbar-sub">Painel Principal</div>
+    </div>
+    <div class="topbar-spacer"></div>
+    <button class="logout-btn" onclick="doLogout()">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+      </svg>
+      Sair
+    </button>
+  </div>
+
+  <div class="dash-main fade-enter">
+    <p class="dash-greeting">Olá, bem-vindo! 👋</p>
+    <p class="dash-title">O que vamos gerenciar hoje?</p>
+
+    <div class="nav-cards">
+      <a class="nav-card cyan-card" href="categories.html" style="text-decoration:none; color:inherit;">
+        <div class="card-icon-wrap" style="background:#00D4FF18;">
+          <svg fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="1.7">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+          </svg>
+        </div>
+        <p class="card-title">Categorias</p>
+        <p class="card-subtitle">Gerencie tipos de<br>receita e despesa</p>
+        <span class="card-link" style="color:var(--accent); text-decoration:none;">
+          Acessar
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </span>
+      </a>
+
+      <a class="nav-card green-card" href="transactions.html" style="text-decoration:none; color:inherit;">
+        <div class="card-icon-wrap" style="background:#00E5A018;">
+          <svg fill="none" viewBox="0 0 24 24" stroke="var(--success)" stroke-width="1.7">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+          </svg>
+        </div>
+        <p class="card-title">Transações</p>
+        <p class="card-subtitle">Registre entradas<br>e saídas financeiras</p>
+        <span class="card-link" style="color:var(--success)">
+          Acessar
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js" defer></script>
+</body>
+</html>

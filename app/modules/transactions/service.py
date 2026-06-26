@@ -1,14 +1,12 @@
 from app.modules.transactions.schemas import TransactionCreate, TransactionUpdate
 from app.db.models.trasactions import TransactionsDB, TransactionType
 from app.db.models.categories import CategoryDB
-from fastapi import HTTPException, Depends
+from fastapi import Depends
 from app.db.session import get_db
-from sqlalchemy import func
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 from app.repository.transactions_repository import TransactionRepository
-from app.core.exceptions.base import *
+from app.core.exceptions.base import ItemNaoEncontrado
 
 class TransactionService:
     def __init__(self, db: Session = Depends(get_db)):

@@ -37,7 +37,7 @@ class CategoryRepository:
     def list_all_category(self, user_id: int):
         category = self.db.query(CategoryDB).filter(
             CategoryDB.user_id == user_id,
-            CategoryDB.is_activated  == True
+            CategoryDB.is_activated
 ).all()
 
         return category

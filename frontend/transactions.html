@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transacoes - Gestao Financeira</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/transactions.css">
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="header-top">
+      <button class="btn-back" onclick="voltar()"> 
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Voltar</span>
+      </button>
+      <span class="breadcrumb-label">GESTAO FINANCEIRA</span>
+    </div>
+    <div class="header-title">
+      <svg class="header-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9H13V7.5h-2V11H8.5v2h2.5v3.5h2V13h2.5v-2z"/>
+      </svg>
+      <h1>Transactions</h1>
+      <button class="btn-action btn-create" onclick="criarTransacao()">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+          </svg>
+          <span>Nova transacao</span>
+      </button>
+      <button class="btn-action btn-create-cat" onclick="criarCategoria()">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2zm7 9h-3v3h-2v-3H9v-2h3V8h2v3h3v2z"/>
+          </svg>
+          <span>Nova categoria</span>
+      </button>
+      <button class="btn-action btn-goto-cat" onclick="irCategorias()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          <span>Categorias</span>
+      </button>
+    </div>
+  </div>
+  <div class="transactions-container">
+    <div class="summary-cards">
+      <div class="summary-card cyan" onclick="openReports()">
+        <div class="summary-card-header">
+          <span class="summary-label">Receitas</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+        </div>
+        <div class="summary-value" id="summaryIncome">R$ 0,00</div>
+        <div class="summary-change positive" id="summaryIncomeChange">Carregando...</div>
+      </div>
+
+      <div class="summary-card green" onclick="openReports()">
+        <div class="summary-card-header">
+          <span class="summary-label">Saldo</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+        </div>
+        <div class="summary-value" id="summaryBalance">R$ 0,00</div>
+        <div class="summary-change positive" id="summaryBalanceChange">Carregando...</div>
+      </div>
+
+      <div class="summary-card red" onclick="openReports()">
+        <div class="summary-card-header">
+          <span class="summary-label">Despesas</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+        </div>
+        <div class="summary-value" id="summaryExpense">R$ 0,00</div>
+        <div class="summary-change negative" id="summaryExpenseChange">Carregando...</div>
+      </div>
+    </div>
+
+    <div class="transactions-section">
+      <div class="section-header">
+        <h2>Transacoes Recentes</h2>
+        <button class="btn-view-all" onclick="openAllTransactions()">
+          Ver todas ->
+        </button>
+      </div>
+      <div class="transactions-list" id="recentTransactionsList">
+        <p style="color: var(--subtext); text-align: center; padding: 20px;">Carregando transacoes...</p>
+      </div>
+      <div class="charts-row">
+        <div class="chart-container">
+          <h3>Distribuicao de Receitas</h3>
+          <div class="chart-layout">
+            <div class="chart-canvas-wrap">
+              <canvas id="mainChart" width="220" height="220"></canvas>
+            </div>
+            <div class="chart-legend" id="mainChartLegend">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="txn-modal-overlay" id="allTransactionsModal">
+    <div class="txn-modal-box">
+      <div class="txn-modal-hdr">
+        <div class="txn-modal-hdr-left">
+          <div class="txn-modal-ico">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9H13V7.5h-2V11H8.5v2h2.5v3.5h2V13h2.5v-2z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="txn-modal-title">Todas as Transacoes</div>
+            <div class="txn-modal-sub">Mes atual e historico</div>
+          </div>
+        </div>
+        <button class="txn-modal-x" onclick="closeAllTransactions()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="txn-modal-body">
+        <div class="txn-filters">
+          <div class="filter-group">
+            <label>Mes</label>
+            <select id="monthFilterAll" onchange="updateAllTransactions()">
+              <option value="">Todos</option>
+              <option value="1">Janeiro</option>
+              <option value="2">Fevereiro</option>
+              <option value="3">Marco</option>
+              <option value="4">Abril</option>
+              <option value="5">Maio</option>
+              <option value="6">Junho</option>
+              <option value="7">Julho</option>
+              <option value="8">Agosto</option>
+              <option value="9">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Ano</label>
+            <select id="yearFilterAll" onchange="updateAllTransactions()">
+              <option value="">Todos</option>
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+            </select>
+          </div>
+          <div class="search-wrap-txn">
+            <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" id="searchTransactions" placeholder="Buscar por nome..." onkeyup="updateAllTransactions()">
+          </div>
+        </div>
+        <div class="txn-tabs">
+          <button class="txn-tab-btn active" onclick="switchTab('monthly')">Mes Atual</button>
+          <button class="txn-tab-btn" onclick="switchTab('all')">Todo Historico</button>
+        </div>
+        <div id="monthlyTab" class="txn-tab-content active">
+          <div class="txn-cards-list" id="monthlyTransactionsList">
+          </div>
+          <div class="txn-pagination">
+            <button class="txn-pag-btn" onclick="prevPageMonthly()"><- Anterior</button>
+            <span class="txn-pag-info">Pagina <span id="currentPageMonthly">1</span> de <span id="totalPagesMonthly">1</span></span>
+            <button class="txn-pag-btn" onclick="nextPageMonthly()">Proxima -></button>
+          </div>
+        </div>
+        <div id="allTab" class="txn-tab-content">
+          <div id="historyByMonth" class="txn-history-list">
+            <!-- Preenchido por JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="reportsModal">
+    <div class="modal-overlay" onclick="closeReports()"></div>
+    <div class="modal-content modal-wide">
+      <div class="modal-header">
+        <h2>Relatorios Mensais</h2>
+        <button class="modal-close" onclick="closeReports()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body reports-body">
+        <div class="reports-left">
+          <div class="filter-section">
+            <label>Filtrar por Mes:</label>
+            <select id="monthFilter" onchange="updateReports()">
+              <option value="1">Janeiro 2026</option>
+              <option value="2">Fevereiro 2026</option>
+              <option value="3">Marco 2026</option>
+              <option value="4">Abril 2026</option>
+              <option value="5">Maio 2026</option>
+              <option value="6">Junho 2026</option>
+              <option value="7">Julho 2026</option>
+              <option value="8">Agosto 2026</option>
+              <option value="9">Setembro 2026</option>
+              <option value="10">Outubro 2026</option>
+              <option value="11">Novembro 2025</option>
+              <option value="12">Dezembro 2025</option>
+            </select>
+          </div>
+          <div class="reports-section">
+            <h3>Transacoes por Data</h3>
+            <div id="transactionsByDate">
+            </div>
+          </div>
+          <div class="reports-section">
+            <h3>Despesas por Categoria</h3>
+            <div id="categoriesList" class="categories-list">
+              <!-- Preenchido por JavaScript -->
+            </div>
+          </div>
+        </div>
+        <div class="reports-right">
+          <h3>Distribuicao de Gastos</h3>
+          <div class="reports-chart-wrap">
+            <canvas id="reportsChart" width="320" height="320"></canvas>
+          </div>
+          <div class="chart-legend" id="reportsChartLegend"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="transactionActionsModal">
+    <div class="modal-overlay" onclick="closeTransactionActions()"></div>
+    <div class="modal-content modal-actions">
+      <div class="modal-header">
+        <h2>Acoes da Transacao</h2>
+        <button class="modal-close" onclick="closeTransactionActions()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body actions-body">
+        <div class="transaction-detail" id="transactionDetail">
+        </div>
+        <div class="actions-buttons">
+          <button class="btn-action btn-edit" onclick="editarTransacao()">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>
+              <path d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+            <span>Editar</span>
+          </button>
+          <button class="btn-action btn-delete" onclick="deletarTransacao()">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z"/>
+            </svg>
+            <span>Deletar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cat-modal-overlay" id="txFormOverlay" onclick="closeTxFormOverlay(event)">
+    <div class="cat-modal-box">
+      <div class="cat-modal-hdr">
+        <div class="cat-modal-hdr-left">
+          <div class="cat-modal-ico">
+            <svg fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v8m-4-4h8M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="cat-modal-title" id="txFormTitle">Nova Transacao</p>
+            <p class="cat-modal-sub" id="txFormSub">Preencha os dados abaixo</p>
+          </div>
+        </div>
+        <button class="cat-modal-x" onclick="closeTxForm()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="cat-modal-body">
+        <div class="field">
+          <label>Titulo</label>
+          <input type="text" id="txFormName" placeholder="Ex: Salario, Aluguel..." />
+        </div>
+        <div class="field">
+          <label>Descricao (opcional)</label>
+          <input type="text" id="txFormDescription" placeholder="Ex: Salario do mes..." />
+        </div>
+        <div class="field">
+          <label>Valor (R$)</label>
+          <input type="number" id="txFormAmount" placeholder="0,00" step="0.01" min="0" />
+        </div>
+        <div class="field">
+          <label>Data da Transacao</label>
+          <input type="date" id="txFormDate" />
+        </div>
+        <div class="field">
+          <label>Categoria</label>
+          <select id="txFormCategory">
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo</label>
+          <div class="cat-type-toggle">
+            <button class="cat-type-btn receita" id="txTypeIncome" onclick="txSelectType('income')">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+              Receita
+            </button>
+            <button class="cat-type-btn despesa" id="txTypeExpense" onclick="txSelectType('expense')">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
+              </svg>
+              Despesa
+            </button>
+          </div>
+        </div>
+        <div class="status-msg" id="txFormStatus"></div>
+      </div>
+      <div class="cat-modal-ftr">
+        <button class="cat-btn-ghost" onclick="closeTxForm()">Cancelar</button>
+        <button class="cat-btn-submit" onclick="txFormSubmit()">
+          <span id="txFormBtnLbl">Salvar</span>
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="txn-modal-overlay" id="deleteConfirmModal">
+    <div class="txn-modal-box txn-modal-sm">
+      <div class="txn-modal-hdr">
+        <div class="txn-modal-hdr-left">
+          <div class="txn-modal-ico" style="background:#FF3D6B14;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FF3D6B" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div>
+            <div class="txn-modal-title">Confirmar exclusao</div>
+            <div class="txn-modal-sub">Esta acao nao pode ser desfeita</div>
+          </div>
+        </div>
+        <button class="txn-modal-x" onclick="closeDeleteConfirm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="txn-modal-body">
+        <p id="deleteConfirmText" style="font-size:13px;color:var(--text);margin-bottom:18px;line-height:1.5;">
+          Tem certeza que deseja deletar esta transacao?
+        </p>
+        <div class="actions-buttons">
+          <button class="btn-action btn-edit" onclick="closeDeleteConfirm()">
+            <span>Cancelar</span>
+          </button>
+          <button class="btn-action btn-delete" onclick="confirmDelete()">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z"/>
+            </svg>
+            <span>Deletar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cat-modal-overlay" id="catFormOverlay" onclick="closeCatFormOverlay(event)">
+    <div class="cat-modal-box">
+      <div class="cat-modal-hdr">
+        <div class="cat-modal-hdr-left">
+          <div class="cat-modal-ico">
+            <svg fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="cat-modal-title">Nova Categoria</p>
+            <p class="cat-modal-sub">Preencha os dados abaixo</p>
+          </div>
+        </div>
+        <button class="cat-modal-x" onclick="closeCatForm()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="cat-modal-body">
+        <div class="field">
+          <label>Nome</label>
+          <input type="text" id="catFormName" placeholder="Ex: Alimentacao, Transporte..." />
+        </div>
+        <div class="field">
+          <label>Descricao (opcional)</label>
+          <input type="text" id="catFormDescription" placeholder="Ex: Gastos com alimentacao..." />
+        </div>
+        <div class="field">
+          <label>Tipo</label>
+          <div class="cat-type-toggle">
+            <button class="cat-type-btn receita" id="catTypeIncome" onclick="catSelectType('income')">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+              Receita
+            </button>
+            <button class="cat-type-btn despesa" id="catTypeExpense" onclick="catSelectType('expense')">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
+              </svg>
+              Despesa
+            </button>
+          </div>
+        </div>
+        <div class="status-msg" id="catFormStatus"></div>
+      </div>
+      <div class="cat-modal-ftr">
+        <button class="cat-btn-ghost" onclick="closeCatForm()">Cancelar</button>
+        <button class="cat-btn-submit" onclick="catFormSubmit()">
+          <span id="catFormBtnLbl">Criar</span>
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/transactions.js" defer></script>
+</body>
+</html>
