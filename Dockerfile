@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /app
 
 
-RUN uvicorn app.main:app
+RUN python -m venv .venv
 COPY requirements.txt ./
 RUN .venv/bin/pip install -r requirements.txt
 FROM python:3.12.13-slim
