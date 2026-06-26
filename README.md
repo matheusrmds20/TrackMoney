@@ -75,8 +75,8 @@ FinanceApp/app
 
 ### 1️⃣ Clonar o repositório
 ```text
-git clone https://github.com/matheusrmds20/FastAPI_FInanceiro
-cd FastAPI_FInanceiro
+git clone https://github.com/matheusrmds20/TrackMoney
+cd TrackMoney
 ```
 
 ### 2️⃣ Criar ambiente virtual
