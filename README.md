@@ -1,4 +1,4 @@
-# Finance App
+# TrackMoney
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![Pydantic](https://img.shields.io/badge/pydantic-%23E92063.svg?style=for-the-badge&logo=pydantic&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens) ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
 
@@ -67,9 +67,7 @@ FinanceApp/app
 │   ├── coftest.py
 │   └──  test_transaction.py
 │ 
-├── main.py
-│ 
-└── requirements.txt
+└── main.py
 
 ```
 
