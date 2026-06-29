@@ -1,4 +1,4 @@
-const API = "http://127.0.0.1:8000";
+const API = "https://trackmoney.fly.dev/";
 let currentTab = "login";
 
 function setStatus(id, msg, type) {
