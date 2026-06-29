@@ -6,8 +6,8 @@ WORKDIR /app
 
 
 RUN python -m venv .venv
-COPY requirements.txt ./
-RUN .venv/bin/pip install -r requirements.txt
+COPY requirements.txt .
+RUN /app/.venv/bin/pip install -r requirements.txt
 FROM python:3.12.13-slim
 WORKDIR /app
 COPY --from=builder /app/.venv .venv/
