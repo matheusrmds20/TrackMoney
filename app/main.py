@@ -14,6 +14,11 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+@app.options("/{path:path}")
+async def handle_options(path: str):
+    return {"status": "ok"}
+
+
 origins = [
     "http://localhost",
     "http://127.0.0.1",
