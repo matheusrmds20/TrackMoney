@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://trackmoney.fly.dev';
+const API_BASE_URL = "https://trackmoney-jjnl.onrender.com";
 
 let allTransactions = [];
 let categories = [];

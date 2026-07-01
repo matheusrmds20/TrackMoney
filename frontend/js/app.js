@@ -1,4 +1,4 @@
-const API = "https://trackmoney.fly.dev";
+const API = "https://trackmoney-jjnl.onrender.com";
 let currentTab = "login";
 
 function setStatus(id, msg, type) {

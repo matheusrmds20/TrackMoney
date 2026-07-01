@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE = "https://trackmoney.fly.dev";
+  const API_BASE = "https://trackmoney-jjnl.onrender.com";
 
   let categories = [];
   let editingId = null;
