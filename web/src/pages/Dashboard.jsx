@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { MonthYearPicker } from '@/components/MonthYearPicker'
 import { useCategories } from '@/lib/useCategories'
-import { TrendingDown, TrendingUp, Plus, Receipt } from 'lucide-react'
+import { TrendingDown, TrendingUp, Plus, Receipt, RefreshCw, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
 
@@ -52,6 +52,10 @@ export default function Dashboard() {
       setReport(rep)
       setRecent(txn)
     } catch (e) {
+      // Sem dados confiáveis: mantém o relatório zerado para não exibir
+      // números falsos, mas mostra o estado de erro com opção de tentar de novo.
+      setReport({ income: 0, expense: 0, by_category: {} })
+      setRecent([])
       setError(e.message)
       toast.error('Não foi possível carregar o painel.')
     } finally {
@@ -79,9 +83,7 @@ export default function Dashboard() {
     return (
       <PageHead title={`Balanço de ${title}`} eyebrow="Visão geral">
         <MonthYearPicker value={range} onChange={setRange} />
-        <div className="mt-10 rounded-lg border border-border bg-card p-10 text-center text-muted-foreground">
-          Não foi possível carregar o painel.
-        </div>
+        <ErrorState onRetry={load} />
       </PageHead>
     )
   }
@@ -287,6 +289,26 @@ function EmptyRow({ onAction }) {
       >
         Registrar a primeira despesa →
       </button>
+    </div>
+  )
+}
+
+function ErrorState({ onRetry }) {
+  return (
+    <div
+      role="alert"
+      className="mt-10 flex flex-col items-center rounded-xl border border-border bg-card px-6 py-14 text-center"
+    >
+      <div className="flex size-14 items-center justify-center rounded-full bg-expense/10 text-expense">
+        <AlertCircle className="size-6" />
+      </div>
+      <h2 className="display mt-5 text-2xl">Não foi possível carregar o painel</h2>
+      <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+        Houve um erro ao buscar seus dados. Verifique sua conexão e tente novamente.
+      </p>
+      <Button variant="outline" className="mt-7" onClick={onRetry}>
+        <RefreshCw /> Tentar novamente
+      </Button>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Pencil, Plus, Search, Trash2 } from 'lucide-react'
 import api from '@/lib/api'
@@ -43,15 +43,18 @@ export default function Transactions() {
   // Abre o diálogo “nova despesa/receita” automaticamente quando o dashboard
   // navega com { state: { open: 'new', presetType } }.
   const location = useLocation()
+  const navigate = useNavigate()
   useEffect(() => {
     if (location.state?.open === 'new') {
       const preset = location.state.presetType === 'income' ? 'income' : 'expense'
       setEditing(null)
       setDialogType(preset)
       setOpenForm(true)
-      window.history.replaceState({}, document.title)
+      // Limpa o state sem recarregar a página (replaceState puro quebra o
+      // history do router e o diálogo poderia reabrir).
+      navigate(location.pathname, { replace: true, state: {} })
     }
-  }, [location])
+  }, [location, navigate])
 
   const load = useCallback(async () => {
     setLoading(true)
