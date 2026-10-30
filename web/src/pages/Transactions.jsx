@@ -26,7 +26,7 @@ const TYPE_FILTERS = [
 ]
 
 export default function Transactions() {
-  const { categories } = useCategories()
+  const { categories, refresh: refreshCategories } = useCategories()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -268,6 +268,7 @@ export default function Transactions() {
         categories={categories}
         presetType={dialogType}
         onSaved={load}
+        onCategoriesChanged={refreshCategories}
       />
 
       <ConfirmDialog

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -6,6 +6,7 @@ import { transactionSchema } from '@/lib/schemas'
 import api from '@/lib/api'
 import { toInputDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { CategoryDialog } from '@/components/CategoryDialog'
 import {
   Dialog,
   DialogContent,
@@ -36,7 +37,22 @@ const EMPTY = {
   transaction_date: '',
 }
 
-export function TransactionDialog({ open, onOpenChange, editing, categories, onSaved, presetType = 'expense' }) {
+export function TransactionDialog({
+  open,
+  onOpenChange,
+  editing,
+  categories,
+  onSaved,
+  presetType = 'expense',
+  // Callback para o pai recarregar as categorias quando uma é criada no meio
+  // do fluxo de lançamento.
+  onCategoriesChanged,
+}) {
+  const [openCategory, setOpenCategory] = useState(false)
+  // Sem categoria não é possível gravar um lançamento (o backend exige
+  // category_id): sinalizado aqui e na página que hospeda o diálogo.
+  const noCategories = categories.length === 0
+
   const {
     register,
     handleSubmit,
@@ -157,23 +173,40 @@ export function TransactionDialog({ open, onOpenChange, editing, categories, onS
 
           <div>
             <Label>Categoria</Label>
-            <Select
-              value={watch('category_id') || undefined}
-              onValueChange={(v) => setValue('category_id', v)}
-            >
-              <SelectTrigger className="mt-1.5">
-                <SelectValue placeholder="Escolha a categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((c) => (
-                  <SelectItem key={c.id} value={String(c.id)}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.category_id && (
-              <p className="mt-1 text-xs text-expense">{errors.category_id.message}</p>
+            {noCategories ? (
+              <div className="mt-1.5 rounded-md border border-dashed border-border bg-surface px-3 py-3 text-sm">
+                <p className="text-muted-foreground">
+                  Você precisa de ao menos uma categoria para lançar.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setOpenCategory(true)}
+                  className="mt-1 font-medium text-primary hover:underline"
+                >
+                  Criar categoria →
+                </button>
+              </div>
+            ) : (
+              <>
+                <Select
+                  value={watch('category_id') || undefined}
+                  onValueChange={(v) => setValue('category_id', v)}
+                >
+                  <SelectTrigger className="mt-1.5">
+                    <SelectValue placeholder="Escolha a categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((c) => (
+                      <SelectItem key={c.id} value={String(c.id)}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.category_id && (
+                  <p className="mt-1 text-xs text-expense">{errors.category_id.message}</p>
+                )}
+              </>
             )}
           </div>
 
@@ -190,12 +223,24 @@ export function TransactionDialog({ open, onOpenChange, editing, categories, onS
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || noCategories}>
               {isSubmitting && <Loader2 className="size-4 animate-spin" />}
               {editing ? 'Salvar' : 'Criar'}
             </Button>
           </DialogFooter>
         </form>
+
+        {/* CRUD de categoria sem sair do fluxo de lançamento. */}
+        <CategoryDialog
+          open={openCategory}
+          onOpenChange={setOpenCategory}
+          editing={null}
+          initialType={type}
+          onSaved={() => {
+            // Recarrega a lista e mantém o diálogo de lançamento aberto.
+            onCategoriesChanged?.()
+          }}
+        />
       </DialogContent>
     </Dialog>
   )

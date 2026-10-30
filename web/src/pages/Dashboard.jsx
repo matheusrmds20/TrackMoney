@@ -6,8 +6,9 @@ import { StatCard } from '@/components/StatCard'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { MonthYearPicker } from '@/components/MonthYearPicker'
+import { CategoryDialog } from '@/components/CategoryDialog'
 import { useCategories } from '@/lib/useCategories'
-import { TrendingDown, TrendingUp, Plus, Receipt, RefreshCw, AlertCircle } from 'lucide-react'
+import { TrendingDown, TrendingUp, Plus, Receipt, RefreshCw, AlertCircle, FolderPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
 
@@ -22,7 +23,8 @@ export default function Dashboard() {
   const [recent, setRecent] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const { categories } = useCategories()
+  const [openCategory, setOpenCategory] = useState(false)
+  const { categories, loaded: catsLoaded, refresh: refreshCategories } = useCategories()
   const navigate = useNavigate()
 
   const load = useCallback(async () => {
@@ -80,6 +82,9 @@ export default function Dashboard() {
   }
   const topCats = Object.entries(byCat).sort((a, b) => b[1] - a[1]).slice(0, 4)
   const isEmpty = !loading && !error && income <= 0 && expense <= 0 && recent.length === 0
+  // Sem categoria não existe lançamento possível: o próximo passo do onboarding
+  // passa a ser criar uma categoria, não abrir o formulário de transação.
+  const hasNoCategories = catsLoaded && categories.length === 0
 
   if (error) {
     return (
@@ -95,9 +100,17 @@ export default function Dashboard() {
       <PageHead title={`Balanço de ${title}`} eyebrow="Visão geral">
         <MonthYearPicker value={range} onChange={setRange} />
         <EmptyDashboard
+          needsCategory={hasNoCategories}
+          onCreateCategory={() => setOpenCategory(true)}
           onCreate={(type) =>
             navigate('/despesas', { state: { open: 'new', presetType: type } })
           }
+        />
+        <CategoryDialog
+          open={openCategory}
+          onOpenChange={setOpenCategory}
+          editing={null}
+          onSaved={() => refreshCategories()}
         />
       </PageHead>
     )
@@ -152,11 +165,19 @@ export default function Dashboard() {
             {loading ? (
               <LoadingRows rows={4} />
             ) : recent.length === 0 ? (
-              <EmptyRow
-                onAction={() =>
-                  navigate('/despesas', { state: { open: 'new', presetType: 'expense' } })
-                }
-              />
+              hasNoCategories ? (
+                <EmptyRow
+                  message="Nenhum lançamento ainda."
+                  actionLabel="Criar uma categoria →"
+                  onAction={() => setOpenCategory(true)}
+                />
+              ) : (
+                <EmptyRow
+                  onAction={() =>
+                    navigate('/despesas', { state: { open: 'new', presetType: 'expense' } })
+                  }
+                />
+              )
             ) : (
               recent.map((t) => (
                 <TableRow key={t.id} t={t} cat={catName(t.category_id)} />
@@ -281,15 +302,15 @@ function LoadingRows({ rows }) {
   )
 }
 
-function EmptyRow({ onAction }) {
+function EmptyRow({ onAction, message = 'Nenhum lançamento ainda.', actionLabel = 'Registrar a primeira despesa →' }) {
   return (
     <div className="px-4 py-10 text-center">
-      <p className="text-sm text-muted-foreground">Nenhum lançamento ainda.</p>
+      <p className="text-sm text-muted-foreground">{message}</p>
       <button
         onClick={onAction}
         className="mt-2 text-sm font-medium text-primary hover:underline"
       >
-        Registrar a primeira despesa →
+        {actionLabel}
       </button>
     </div>
   )
@@ -315,7 +336,7 @@ function ErrorState({ onRetry }) {
   )
 }
 
-function EmptyDashboard({ onCreate }) {
+function EmptyDashboard({ onCreate, needsCategory, onCreateCategory }) {
   return (
     <div className="mt-10 flex flex-col items-center rounded-xl border border-dashed border-border bg-card px-6 py-16 text-center">
       <div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -323,16 +344,25 @@ function EmptyDashboard({ onCreate }) {
       </div>
       <h2 className="display mt-5 text-2xl">Sua conta ainda está vazia</h2>
       <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-        Nada por aqui ainda. Registre sua primeira movimentação para ver aqui o resumo do mês ao
-        vivo.
+        {needsCategory
+          ? 'Antes de registrar um lançamento, crie ao menos uma categoria — é ela que classifica despesas e receitas.'
+          : 'Nada por aqui ainda. Registre sua primeira movimentação para ver aqui o resumo do mês ao vivo.'}
       </p>
       <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-        <Button onClick={() => onCreate('expense')}>
-          <TrendingDown /> Criar despesa
-        </Button>
-        <Button variant="outline" onClick={() => onCreate('income')}>
-          <TrendingUp /> Criar receita
-        </Button>
+        {needsCategory ? (
+          <Button onClick={onCreateCategory}>
+            <FolderPlus /> Criar categoria
+          </Button>
+        ) : (
+          <>
+            <Button onClick={() => onCreate('expense')}>
+              <TrendingDown /> Criar despesa
+            </Button>
+            <Button variant="outline" onClick={() => onCreate('income')}>
+              <TrendingUp /> Criar receita
+            </Button>
+          </>
+        )}
       </div>
     </div>
   )

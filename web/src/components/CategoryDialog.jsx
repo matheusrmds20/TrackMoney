@@ -22,7 +22,7 @@ import { Loader2 } from 'lucide-react'
 
 const EMPTY = { name: '', type: 'expense', description: '' }
 
-export function CategoryDialog({ open, onOpenChange, editing, onSaved }) {
+export function CategoryDialog({ open, onOpenChange, editing, onSaved, initialType }) {
   const {
     register,
     handleSubmit,
@@ -37,8 +37,12 @@ export function CategoryDialog({ open, onOpenChange, editing, onSaved }) {
 
   useEffect(() => {
     if (!open) return
-    reset(editing ? categoryFormDefaults(editing) : EMPTY)
-  }, [open, editing, reset])
+    reset(
+      editing
+        ? categoryFormDefaults(editing)
+        : { ...EMPTY, type: initialType === 'income' ? 'income' : 'expense' },
+    )
+  }, [open, editing, reset, initialType])
 
   const type = watch('type')
 
