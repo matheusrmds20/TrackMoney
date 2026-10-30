@@ -62,17 +62,16 @@ class ReportService:
 
         category = self.repository.categorys(user_id, start, end)
         
+        # Mês sem lançamentos é um resultado vazio legítimo, não um erro:
+        # retorna {} para o painel conseguir exibir o estado “conta vazia”.
         if not category:
-            raise ValueError("Nao ha gasto neste mes")
+            return {}
         
         return {name: float(total) for name, total in category}
 
     def monthly_report(self, user_id: int, year: int, month: int):
         balance_monthly = self.balance(user_id, year, month)
         category_monthly = self.by_category(user_id, year, month)
-        
-        if not balance_monthly:
-            raise ValueError("Nao ha gasto neste mes")
 
         return{
             **balance_monthly,

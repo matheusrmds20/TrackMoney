@@ -29,8 +29,11 @@ export default function Dashboard() {
     setLoading(true)
     setError(null)
     try {
-      // Lida com 404 por chamada: a API retorna 404 quando a conta (ou aquele
-      // mês) ainda não tem lançamentos — isso é “vazio”, não erro.
+      // Lida com 400/404 por chamada: a API sinaliza “sem lançamentos no mês”
+      // assim (histórico) — isso é “vazio”, não erro.
+      const isEmptyStatus = (reason) =>
+        [400, 404].includes(reason?.response?.status)
+
       const [repRes, txnRes] = await Promise.allSettled([
         api.get('/report/monthly_report', { params: range }),
         api.get('/transactions/list', { params: { page: 1, limit: 8 } }),
@@ -38,14 +41,13 @@ export default function Dashboard() {
 
       let rep = null
       if (repRes.status === 'fulfilled') rep = repRes.value.data
-      else if (repRes.reason?.response?.status === 404)
-        rep = { income: 0, expense: 0, by_category: {} }
+      else if (isEmptyStatus(repRes.reason)) rep = { income: 0, expense: 0, by_category: {} }
       else throw repRes.reason
 
       let txn = []
       if (txnRes.status === 'fulfilled') {
         txn = Array.isArray(txnRes.value.data.items) ? txnRes.value.data.items : []
-      } else if (txnRes.reason?.response?.status !== 404) {
+      } else if (!isEmptyStatus(txnRes.reason)) {
         throw txnRes.reason
       }
 
