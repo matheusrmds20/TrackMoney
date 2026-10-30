@@ -18,6 +18,9 @@ __pycache__/
 .coverage
 htmlcov/
 
+# Playwright MCP (temporários)
+.playwright-mcp/
+
 # IDEs e Sistema Operacional
 .vscode/
 .idea/

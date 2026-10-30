@@ -78,12 +78,6 @@ class TransactionService:
 
         data = self.repository.offset(query, offset, limit)
 
-
-        transactions = self.repository.user_id_all(user_id)
-
-        if not transactions:
-            raise ItemNaoEncontrado("Transacao nao encontrada")
-
         if limit > 100:
             raise ValueError("Limite muito alto")
 

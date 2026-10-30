@@ -1,0 +1,173 @@
+@import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
+
+/* ============ Ledger · Paper (light) ============ */
+:root {
+  --background: #f3f1ea;
+  --surface: #faf8f1;
+  --card: #fcfaf4;
+  --card-2: #efece2;
+  --popover: #fcfaf4;
+  --foreground: #1a1b1f;
+  --border: #e3dfd3;
+  --border-strong: #cfc9b8;
+  --input: #dcd7c8;
+  --ring: #0e7a66;
+
+  --primary: #0e7a66;
+  --primary-foreground: #f7fbf7;
+  --secondary: #ece8db;
+  --secondary-foreground: #2a2b2e;
+  --accent: #ede7d5;
+  --accent-foreground: #1a1b1f;
+  --muted: #6f6a5d;
+  --muted-foreground: #837c6b;
+  --destructive: #c2410c;
+  --destructive-foreground: #fdf6f1;
+
+  --income: #0e7a66;
+  --expense: #c2410c;
+  --warning: #a16207;
+
+  --r-sm: 0.4rem;
+  --r-md: 0.625rem;
+  --r-lg: 0.9rem;
+  --r-xl: 1.15rem;
+}
+
+/* ============ Ledger · Noir (dark) ============ */
+.dark {
+  --background: #0e0d0b;
+  --surface: #141310;
+  --card: #1b1a16;
+  --card-2: #22211c;
+  --popover: #1b1a16;
+  --foreground: #efe7d8;
+  --border: #2a2822;
+  --border-strong: #3a372e;
+  --input: #332f26;
+  --ring: #c7a45d;
+
+  --primary: #c7a45d;
+  --primary-foreground: #1c150b;
+  --secondary: #26231c;
+  --secondary-foreground: #efe7d8;
+  --accent: #26231c;
+  --accent-foreground: #f3ead9;
+  --muted: #a49b87;
+  --muted-foreground: #7d7561;
+  --destructive: #cf6a5b;
+  --destructive-foreground: #200d09;
+
+  --income: #5f8f7a;
+  --expense: #cf7b7b;
+  --warning: #d99f4e;
+}
+
+/* ============ Token -> Tailwind (Tailwind v4) ============ */
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-card-2: var(--card-2);
+  --color-popover: var(--popover);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-income: var(--income);
+  --color-expense: var(--expense);
+  --color-warning: var(--warning);
+
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Numeros tabulares (valores e balanços) */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Tipografia display (Fraunces) */
+.display {
+  font-family: var(--font-display);
+  font-weight: 520;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+}
+
+/* scrollbar sutil */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+  background-clip: padding-box;
+}
+
+/* Micro-animação: abertura de dialogs/popovers/menus */
+@keyframes ldgFade {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.ldg-pop {
+  animation: ldgFade 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes ldgOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.ldg-overlay {
+  animation: ldgOverlay 0.16s ease;
+}
+
+/* Reduz movimento quando o usuário prefere */
+@media (prefers-reduced-motion: reduce) {
+  .ldg-pop, .ldg-overlay { animation: none; }
+}
