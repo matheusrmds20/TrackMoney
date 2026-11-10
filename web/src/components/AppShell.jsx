@@ -81,7 +81,7 @@ function UserBlock({ onNavigate }) {
       <button
         onClick={() => {
           logout()
-          navigate('/login')
+          navigate('/') // volta à landing pública após sair
         }}
         title="Sair"
         className="text-muted-foreground transition-colors hover:text-expense"

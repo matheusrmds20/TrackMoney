@@ -29,8 +29,7 @@ origins = [
     "http://127.0.0.1:5500",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://track-money-blue.vercel.app",
-    "https://track-money-blue.vercel.app/"
+    "https://ledger.matheuslab.xyz"
 ]
 
 app.add_middleware(
