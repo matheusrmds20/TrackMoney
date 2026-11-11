@@ -1,14 +1,43 @@
 version: 2
+
+# Agrupa as atualizações de dependências em PRs únicos por ecossistema,
+# reduzindo o volume de PRs do Dependabot.
 updates:
   - package-ecosystem: pip
     directory: "/"
     schedule:
       interval: weekly
+    groups:
+      python:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 10
+
   - package-ecosystem: npm
     directory: "/web"
     schedule:
       interval: weekly
+    groups:
+      # Separar majors evita misturar breaking changes no mesmo PR.
+      npm-major:
+        patterns:
+          - "*"
+        update-types:
+          - major
+      npm-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    open-pull-requests-limit: 10
+
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: weekly
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 10
