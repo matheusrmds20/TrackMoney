@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     FRONTEND_ORIGINS: str = "http://localhost:5173, https://ledger.matheuslab.xyz"
     # Hosts aceitos no header `Host` (sem esquema: TrustedHost compara host[:port]).
     ALLOWED_HOSTS: str = (
-        "localhost,127.0.0.1,testserver,api.ledger.matheuslab.xyz,api.matheuslab.xyz,trackmoney-jjnl.onrender.com"
+        "localhost,127.0.0.1,testserver,api.ledger.matheuslab.xyz,trackmoney-jjnl.onrender.com"
     )
 
     COOKIE_DOMAIN: str | None = None

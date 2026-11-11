@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://api.matheuslab.xyz";
+const API_BASE_URL = "https://api.ledger.matheuslab.xyz";
 
 let allTransactions = [];
 let categories = [];

@@ -1,4 +1,4 @@
-const API = "https://api.matheuslab.xyz";
+const API = "https://api.ledger.matheuslab.xyz";
 let currentTab = "login";
 
 function setStatus(id, msg, type) {

@@ -16,10 +16,10 @@ export default defineConfig({
     // Proxy de dev: elimina CORS ao encaminhar pedidos de /auth, /category,
     // /transactions e /report ao backend. Assim o dev funciona sem redeploy do CORS.
     proxy: {
-      '/auth': 'https://api.matheuslab.xyz',
-      '/category': 'https://api.matheuslab.xyz',
-      '/transactions': 'https://api.matheuslab.xyz',
-      '/report': 'https://api.matheuslab.xyz',
+      '/auth': 'https://api.ledger.matheuslab.xyz',
+      '/category': 'https://api.ledger.matheuslab.xyz',
+      '/transactions': 'https://api.ledger.matheuslab.xyz',
+      '/report': 'https://api.ledger.matheuslab.xyz',
     },
   },
 })

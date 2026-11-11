@@ -2,7 +2,7 @@ import axios from 'axios'
 
 export const API_URL =
   import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? '' : 'https://api.matheuslab.xyz')
+  (import.meta.env.DEV ? '' : 'https://api.ledger.matheuslab.xyz')
 
 const CSRF_COOKIE = 'csrf_token'
 

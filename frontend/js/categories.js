@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE = "https://api.matheuslab.xyz";
+  const API_BASE = "https://api.ledger.matheuslab.xyz";
 
   let categories = [];
   let editingId = null;
