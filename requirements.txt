@@ -8,19 +8,19 @@
 #   pip-compile requirements.txt -o requirements.lock.txt
 
 # --- Web framework ---
-fastapi==0.135.1
-starlette==1.3.1
-uvicorn==0.41.0
+fastapi==0.162.2
+starlette==1.10.0
+uvicorn==0.54.0
 
 # --- Validacao / settings ---
-pydantic==2.14.2
-pydantic-settings==2.14.2
+pydantic==2.14.3
+pydantic-settings==2.16.2
 email-validator==2.3.0
 
 # --- Banco de dados ---
-SQLAlchemy==2.0.48
-alembic==1.18.4
-psycopg2-binary==2.9.11
+SQLAlchemy==2.1.8
+alembic==1.20.1
+psycopg2-binary==2.9.13
 
 # --- Autenticacao / seguranca ---
 PyJWT==2.15.1
@@ -29,10 +29,10 @@ passlib==1.7.4
 
 # --- Rate limiting / multipart (OAuth2PasswordRequestForm) ---
 slowapi==0.1.10
-python-multipart==0.0.32
+python-multipart==0.0.33
 
 # --- Testes ---
-pytest==9.1.1
+pytest==9.2.0
 # TestClient do starlette. Ficar no httpx (nao httpx2): com httpx2 o
 # client.cookies.set(path=...) sobrescreve o cookie em vez de manter uma
 # entrada por path, o que quebra test_session.py::test_refresh_rotates...
