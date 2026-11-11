@@ -20,6 +20,11 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 14
     DATABASE_URL: str = _DEFAULT_DEV_DB
 
+    # Aplica `alembic upgrade head` no boot da app. Necessario em PaaS sem
+    # shell/pre-deploy command (Render free). Desligado por padrao para nao
+    # surpreender em dev/testes; ligue com RUN_MIGRATIONS=true.
+    RUN_MIGRATIONS: bool = False
+
     FRONTEND_ORIGINS: str = "http://localhost:5173, https://ledger.matheuslab.xyz"
     # Hosts aceitos no header `Host` (sem esquema: TrustedHost compara host[:port]).
     ALLOWED_HOSTS: str = (

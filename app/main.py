@@ -12,6 +12,7 @@ from app.core.logging import configure_logging
 from app.core.middlewares import register_middlewares
 from app.core.rate_limit import limiter
 from app.core.token_store import purge_expired_tokens
+from app.db.migrations import run_migrations
 from app.db.session import Session, get_db
 from app.modules.categories.routes import router_category
 from app.modules.reports.routes import router_reports
@@ -35,6 +36,9 @@ def purge_expired_auth_state() -> None:
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    # Migrations antes de qualquer query: em PaaS sem shell (Render free) e o
+    # unico ponto de execucao. Controlado por RUN_MIGRATIONS.
+    run_migrations()
     purge_expired_auth_state()
     yield
 
