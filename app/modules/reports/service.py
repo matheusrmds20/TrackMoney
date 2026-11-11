@@ -1,6 +1,8 @@
 from datetime import datetime
+
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, Depends
+
 from app.db.session import get_db
 from app.repository.reports_repository import ReportsRepository
 

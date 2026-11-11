@@ -1,7 +1,9 @@
-from app.db.models.trasactions import TransactionsDB
-from app.db.models.categories import CategoryDB
+from sqlalchemy import desc, extract, func
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc, extract
+
+from app.db.models.categories import CategoryDB
+from app.db.models.trasactions import TransactionsDB
+
 
 class ReportsRepository:
     def __init__(self, db: Session):

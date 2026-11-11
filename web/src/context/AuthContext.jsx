@@ -1,44 +1,38 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import api, { tokenStore } from '@/lib/api'
-import { errMsg } from '@/lib/api'
+import api, { errMsg } from '@/lib/api'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => tokenStore.get())
   const [user, setUser] = useState(null)
+  const [bootstrapped, setBootstrapped] = useState(false)
   const [loading, setLoading] = useState(false)
+  const isAuthed = !!user
 
-  const isAuthed = !!token
-
-  const logout = useCallback(() => {
-    tokenStore.clear()
-    setToken(null)
-    setUser(null)
+  useEffect(() => {
+    api.get('/auth/me')
+      .then((r) => setUser(r.data))
+      .catch(() => setUser(null))
+      .finally(() => setBootstrapped(true))
   }, [])
 
-  // Se a sessão expirar (401 global), desloga.
   useEffect(() => {
-    const handler = () => logout()
-    window.addEventListener('ledger:unauthorized', handler)
-    return () => window.removeEventListener('ledger:unauthorized', handler)
-  }, [logout])
+    const h = () => setUser(null)
+    window.addEventListener('ledger:unauthorized', h)
+    return () => window.removeEventListener('ledger:unauthorized', h)
+  }, [])
 
   const login = useCallback(async ({ email, password }) => {
     setLoading(true)
     try {
-      // O backend usa OAuth2 form (username/password). Sobrescreve o
-      // Content-Type global (application/json) para o form-urlencoded.
       const form = new URLSearchParams()
       form.append('username', email)
       form.append('password', password)
-      const res = await api.post('/auth/login', form, {
+      await api.post('/auth/login', form, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       })
-      const t = res.data.access_token
-      tokenStore.set(t)
-      setToken(t)
-      setUser({ email })
+      const meRes = await api.get('/auth/me')
+      setUser(meRes.data)
       return { ok: true }
     } catch (error) {
       return { ok: false, error: errMsg(error) }
@@ -51,7 +45,6 @@ export function AuthProvider({ children }) {
     setLoading(true)
     try {
       await api.post('/auth/register', { email, password })
-      // Já registrado: entra automaticamente.
       return await login({ email, password })
     } catch (error) {
       return { ok: false, error: errMsg(error) }
@@ -60,13 +53,26 @@ export function AuthProvider({ children }) {
     }
   }, [login])
 
+  const logout = useCallback(async () => {
+    try {
+      await api.post('/auth/logout')
+    } catch {}
+    setUser(null)
+  }, [])
+
+  if (!bootstrapped) return null
+
   return (
-    <AuthContext.Provider value={{ isAuthed, token, user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ isAuthed, user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   )
 }
 
 export function useAuth() {
-  return useContext(AuthContext)
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
 }

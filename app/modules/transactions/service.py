@@ -1,12 +1,15 @@
-from app.modules.transactions.schemas import TransactionCreate, TransactionUpdate
-from app.db.models.trasactions import TransactionsDB, TransactionType
-from app.db.models.categories import CategoryDB
-from fastapi import Depends
-from app.db.session import get_db
-from sqlalchemy.orm import Session
 from datetime import datetime
-from app.repository.transactions_repository import TransactionRepository
+
+from fastapi import Depends
+from sqlalchemy.orm import Session
+
 from app.core.exceptions.base import ItemNaoEncontrado
+from app.db.models.categories import CategoryDB
+from app.db.models.trasactions import TransactionsDB, TransactionType
+from app.db.session import get_db
+from app.modules.transactions.schemas import TransactionCreate, TransactionUpdate
+from app.repository.transactions_repository import TransactionRepository
+
 
 class TransactionService:
     def __init__(self, db: Session = Depends(get_db)):
@@ -108,7 +111,8 @@ class TransactionService:
         else:
             end = datetime(year, month + 1, 1)
 
-        if not (monthly_transactions := self.repository.monthly_transactions_repo(user_id, start, end)):
+        monthly_transactions = self.repository.monthly_transactions_repo(user_id, start, end)
+        if not monthly_transactions:
             raise ItemNaoEncontrado("Transacao nao encontrada")
 
         return monthly_transactions

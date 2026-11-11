@@ -5,17 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ledger · Finanças</title>
-    <script>
-      ;(function () {
-        try {
-          var stored = localStorage.getItem('ledger-theme')
-          var dark = stored ? stored === 'noir' : true
-          var el = document.documentElement
-          el.classList.toggle('dark', dark)
-          el.style.colorScheme = dark ? 'dark' : 'light'
-        } catch (e) {}
-      })()
-    </script>
+    <script src="/theme-init.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

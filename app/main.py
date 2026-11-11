@@ -1,75 +1,82 @@
-from fastapi import FastAPI, Request, Depends
+import logging
+from contextlib import asynccontextmanager
+
+from fastapi import Depends, FastAPI, Request
 from fastapi.responses import JSONResponse
-from app.db.session import Base, engine, get_db
-from app.modules.user.routes import router_user
-from app.modules.categories.routes import router_category
-from app.modules.transactions.routes import router_transaction
-from app.modules.reports.routes import router_reports
-from app.core.exceptions.base import ItemNaoEncontrado
-from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session as OrmSession
+
+from app.core.config import settings
+from app.core.exceptions.base import ItemNaoEncontrado
+from app.core.logging import configure_logging
+from app.core.middlewares import register_middlewares
+from app.core.rate_limit import limiter
+from app.core.token_store import purge_expired_tokens
+from app.db.session import Session, get_db
+from app.modules.categories.routes import router_category
+from app.modules.reports.routes import router_reports
+from app.modules.transactions.routes import router_transaction
+from app.modules.user.routes import router_user
+
+configure_logging()
+logger = logging.getLogger("ledger.app")
+
+def purge_expired_auth_state() -> None:
+    """Retencao: remove tokens expirados/revogados a cada boot (ver SECURITY.md §8)."""
+    db = Session()
+    try:
+        removed = purge_expired_tokens(db)
+        logger.info("token_retention_purge", extra=removed)
+    except Exception as exc:  # nao impede o boot por causa de limpeza
+        logger.warning("token_retention_purge_failed: %s", exc)
+    finally:
+        db.close()
 
 
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    purge_expired_auth_state()
+    yield
 
-Base.metadata.create_all(bind=engine)
-
-
-app = FastAPI()
-
-@app.options("/{path:path}")
-async def handle_options(path: str):
-    return {"status": "ok"}
-
-
-origins = [
-    "http://localhost",
-    "http://127.0.0.1",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://ledger.matheuslab.xyz"
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+fastapi_app = app = FastAPI(
+    title=settings.APP_NAME,
+    docs_url="/docs" if settings.ENABLE_DOCS else None,
+    redoc_url="/redoc" if settings.ENABLE_DOCS else None,
+    openapi_url="/openapi.json" if settings.ENABLE_DOCS else None,
+    lifespan=lifespan,
 )
 
-app.include_router(router_user)
-app.include_router(router_category)
-app.include_router(router_transaction)
-app.include_router(router_reports)
+register_middlewares(fastapi_app)
+
+fastapi_app.include_router(router_user)
+fastapi_app.include_router(router_category)
+fastapi_app.include_router(router_transaction)
+fastapi_app.include_router(router_reports)
 
 
-@app.get("/")
+@fastapi_app.get("/")
 def root():
     return {"status": "ok"}
 
 
-@app.get("/health")
-def root(db: Session = Depends(get_db)):
+@fastapi_app.get("/health")
+@limiter.exempt
+def health(db: OrmSession = Depends(get_db)):
     db.execute(text("SELECT 1")).scalar()
     return {"status": "ok"}
 
-@app.exception_handler(ValueError)
+
+@fastapi_app.exception_handler(ValueError)
 def badrequest(request: Request, exc: ValueError):
-    
     return JSONResponse(
-        status_code = 400,
-        content ={"detail":str(exc)}
+        status_code=400,
+        content={"detail": str(exc)},
     )
 
-@app.exception_handler(ItemNaoEncontrado)
+
+@fastapi_app.exception_handler(ItemNaoEncontrado)
 def notfound(request: Request, exc: ItemNaoEncontrado):
-    
     return JSONResponse(
-        status_code = 404,
-        content ={"detail":str(exc)}
+        status_code=404,
+        content={"detail": str(exc)},
     )
-
-

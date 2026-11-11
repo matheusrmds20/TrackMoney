@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { Moon, Sun, AlertTriangle } from 'lucide-react'
 import { useTheme } from '@/context/ThemeContext'
 import { useAuth } from '@/context/AuthContext'
-import api, { getUserId } from '@/lib/api'
+import api from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
@@ -62,12 +62,12 @@ export default function Settings() {
   const toggleTheme = (mode) => setMode(mode)
 
   const doDelete = async () => {
-    const userId = getUserId()
     setDeleting(true)
     try {
-      await api.delete('/auth/delete_user', { params: { user_id: userId } })
+      // Alvo vem da sessao no servidor (anti-IDOR): sem passar user_id.
+      await api.delete('/auth/me')
       toast.success('Conta excluída. Até logo!')
-      logout()
+      await logout()
       navigate('/login')
     } catch (e) {
       toast.error('Não foi possível excluir a conta.')

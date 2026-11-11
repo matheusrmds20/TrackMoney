@@ -1,5 +1,7 @@
-from pydantic import BaseModel, ConfigDict, Field, field_validator
 from typing import Literal, Optional
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 
 class CategoryBase(BaseModel):
     name: str = Field(min_length=1, max_length=100)

@@ -1,10 +1,12 @@
-from app.modules.categories.schema import CategoryCreate, CategoryUpdate
-from sqlalchemy.orm import Session
-from app.db.models.categories import CategoryType
 from fastapi import Depends
-from app.db.session import get_db
-from app.repository.category_repository import CategoryRepository
+from sqlalchemy.orm import Session
+
 from app.core.exceptions.base import ItemNaoEncontrado
+from app.db.models.categories import CategoryType
+from app.db.session import get_db
+from app.modules.categories.schema import CategoryCreate, CategoryUpdate
+from app.repository.category_repository import CategoryRepository
+
 
 class CategoryService:
     def __init__(self, db: Session = Depends(get_db)):

@@ -1,7 +1,10 @@
-from app.db.models.trasactions import TransactionType
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-from typing import Optional
 from datetime import datetime, timezone
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from app.db.models.trasactions import TransactionType
+
 
 class TrasactionBase(BaseModel):
     title: str = Field(min_length=1, max_length=100)
@@ -31,7 +34,9 @@ class TransactionUpdate(TrasactionBase):
 class TransactionResponse(BaseModel):
     id: int
     title: str
+    value: float = Field(alias="value")
     description: Optional[str] = None
     type: str
+    category_id: int | None = None
 
     model_config = ConfigDict(from_attributes=True)

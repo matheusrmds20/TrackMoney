@@ -1,9 +1,11 @@
-import pytest
 from decimal import Decimal
-from app.db.models.trasactions import TransactionsDB
-from app.modules.transactions.service import TransactionService
-from app.modules.transactions.schemas import TransactionUpdate
+
+import pytest
+
 from app.core.exceptions.base import ItemNaoEncontrado
+from app.db.models.trasactions import TransactionsDB
+from app.modules.transactions.schemas import TransactionUpdate
+from app.modules.transactions.service import TransactionService
 
 # ----------------------------------------------------------------------
 #  TESTES DE FUNCIONAMENTO (SERVICE)
@@ -61,7 +63,9 @@ def test_atualizar_transacao(db_session, default_category, default_transaction):
         category_id=default_category.id
     )
 
-    transacao_atualizada = service_t.update_transaction(user_id=1, transaction_id=tx1.id, data=atualizar)
+    transacao_atualizada = service_t.update_transaction(
+        user_id=1, transaction_id=tx1.id, data=atualizar
+    )
 
     assert transacao_atualizada.title == "testando"
     assert transacao_atualizada.value == 300
@@ -92,6 +96,7 @@ def test_criar_transacao_HTTP(auth_client, default_category):
 
     response = auth_client.post("transactions/?user_id=1", json=payload)
     assert response.status_code == 200
+    assert response.json()["title"] == "Netflix"
 
 
 def test_listar_transacoes_HTTP(auth_client, default_transaction):
@@ -214,13 +219,14 @@ def test_paginacao_maior_0_erro(db_session):
     assert str(excinfo.value) == "Valor de paginas tem ser maior do que 0"
 
 
-def test_transacao_nao_encontrada_erro(db_session):
+def test_listar_sem_transacoes_retorna_lista_vazia(db_session):
+    """Sem lancamentos, a listagem retorna pagina vazia (nao mais 4xx)."""
     service_t = TransactionService(db_session)
 
-    with pytest.raises(ItemNaoEncontrado) as excinfo:
-        service_t.list_transaction(user_id=1, limit=1, page=1)
+    resultado = service_t.list_transaction(user_id=1, limit=1, page=1)
 
-    assert str(excinfo.value) == "Transacao nao encontrada"
+    assert resultado["items"] == []
+    assert resultado["total"] == 0
 
 
 def test_limite_alto_erro(db_session, default_transaction):
@@ -280,13 +286,15 @@ def test_erro_criar_transacao_HTTP(auth_client, default_category):
 
     response = auth_client.post("transactions/?user_id=1", json=payload)
     assert response.status_code == 422
-    assert response.json()["detail"][0]["msg"] == "Input should be a valid number, unable to parse string as a number"
+    msg = response.json()["detail"][0]["msg"]
+    assert msg == "Input should be a valid number, unable to parse string as a number"
 
 
 def test_erro_listar_sem_transacoes_HTTP(auth_client):
 
     response = auth_client.get("transactions/list?user_id=1")
-    assert response.status_code == 404
+    assert response.status_code == 200
+    assert response.json()["items"] == []
 
 
 def test_erro_listar_transacoes_id_nao_autenticado_HTTP(client, default_transaction):
@@ -295,7 +303,7 @@ def test_erro_listar_transacoes_id_nao_autenticado_HTTP(client, default_transact
 
     response = client.get(f"transactions/list/{tx1.id}?user_id=1")
     assert response.status_code == 401
-    assert response.json()["detail"] == "Not authenticated"
+    assert response.json()["detail"] == "Nao autenticado"
 
 
 def test_erro_atualizar_transacao_HTTP(auth_client, default_transaction, default_category):

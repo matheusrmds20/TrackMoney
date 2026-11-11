@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
+
 class BalanceResponse(BaseModel):
     income: float
     expense: float

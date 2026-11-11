@@ -1,7 +1,9 @@
-from app.db.models.categories import CategoryDB
-from sqlalchemy import func 
-from sqlalchemy.orm import Session
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+
+from app.db.models.categories import CategoryDB
+
 
 class CategoryRepository:
     def __init__(self, db: Session):

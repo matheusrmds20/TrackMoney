@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends
+
 from app.core.auth import get_current_user
 from app.db.models.user import UserDB
 from app.modules.reports.service import ReportService
-
-
 
 router_reports = APIRouter(prefix="/report", tags=["report"])
 

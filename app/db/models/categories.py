@@ -1,6 +1,8 @@
-from sqlalchemy import Integer, String, Column, ForeignKey, UniqueConstraint, Enum, Boolean
-from app.db.session import Base
 from enum import Enum as PyEnum
+
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, String, UniqueConstraint
+
+from app.db.session import Base
 
 
 class CategoryType(PyEnum):

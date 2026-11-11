@@ -13,7 +13,8 @@ O frontend React fica em `web/` (stack atual). Existe também um frontend antigo
 ```
 FinanceApp
 ├── app/                    # Backend (FastAPI)
-│   ├── core/               # config, security (JWT/bcrypt), auth, exceções
+│   ├── core/               # config, security, auth, cookies, csrf, rate_limit,
+│   │                       # token_store, logging, middlewares/
 │   ├── db/                 # sessão SQLAlchemy + models (user, category, transactions)
 │   ├── modules/            # regras de negócio por domínio
 │   │   ├── user/           #   /auth
@@ -42,6 +43,12 @@ app/
 ├── core/
 │   ├── config.py           # pydantic-settings (lê .env)
 │   ├── security.py         # hash/verificação bcrypt + criação de JWT
+│   ├── cookies.py          # cookies HttpOnly (access/refresh) + CSRF
+│   ├── csrf.py             # middleware double-submit assinado (HMAC)
+│   ├── rate_limit.py       # slowapi + headers X-RateLimit-*
+│   ├── token_store.py      # denylist de access + rotação de refresh
+│   ├── logging.py          # logs JSON + alerta de picos 401/403/429
+│   ├── middlewares/        # request_id, body_limit, security_headers, access_log
 │   ├── auth.py             # dependência get_current_user (OAuth2 / auth/login)
 │   └── exceptions/base.py  # ItemNaoEncontrado, NaoAutenticado
 ├── db/
@@ -55,27 +62,59 @@ app/
 
 ---
 
-## 🔒 Autenticação JWT
+## 🔒 Autenticação e Segurança
 
-- Access Token gerado no login (`/auth/login`), enviado no header:
+A sessão é **stateless (JWT)** mas entregue ao browser via **cookies `HttpOnly`** — o
+token **nunca** passa pelo JavaScript (imune a roubo via XSS).
 
-```text
-Authorization: Bearer <token>
-```
+| Cookie | Conteúdo | Flags |
+| ------ | -------- | ----- |
+| `access_token` | JWT de acesso (30 min) | `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/` |
+| `refresh_token` | JWT de refresh (14 dias) | `HttpOnly`, `Secure`, `Path=/auth/refresh` |
+| `csrf_token` | token assinado (HMAC) para double-submit | `SameSite=Lax` (legível pelo JS) |
 
-- Token possui tempo de expiração de **30 minutos** (configurável via `ACCESS_TOKEN_EXPIRE_MINUTES`). Ao expirar, é necessário novo login.
-- Senhas são protegidas com **bcrypt**.
-- Rotas protegidas exigem o usuário autenticado via dependência `get_current_user`.
+**Fluxo:**
 
----
+1. `POST /auth/login` → grava os três cookies e devolve apenas `{ "token_type": "cookie" }`.
+2. O frontend chama `GET /auth/me` para obter `id`/`email` (não decodifica mais o JWT).
+3. Quando o access token expira (401), o axios chama `POST /auth/refresh`
+   automaticamente e repete a requisição original.
+4. Toda requisição que muda estado (`POST`/`PATCH`/`DELETE`) envia o header
+   `X-CSRF-Token` com o valor do cookie `csrf_token` (validação *double-submit*
+   com HMAC no middleware — cookie sem assinatura válida é rejeitado com 403).
+5. `POST /auth/logout` revoga o access token (denylist por `jti`) e **todos** os
+   refresh tokens do usuário.
+
+**Outras camadas de proteção**
+
+- **Rate limiting** (`slowapi`): login `5/min` + `20/h` por IP, register `3/min`,
+  global `200/min`. `/health` é isento. Respostas trazem `X-RateLimit-*` e `Retry-After`.
+- **Lockout por e-mail**: 10 falhas em 15 min bloqueiam o login daquele e-mail.
+- **Anti-enumeration**: e-mail inexistente e senha errada devolvem a mesma
+  resposta 401 e o mesmo custo de bcrypt.
+- **CSRF, headers de segurança, body limit (1 MB), TrustedHost, Request-ID** via
+  middlewares (`app/core/middlewares/`).
+- **Logs JSON** com `request_id`, sem PII; alerta `security_signal` em picos de
+  401/403/429 (ver `app/core/logging.py`).
+- **Retenção**: tokens expirados/revogados são purgados no startup.
+- Senhas protegidas com **bcrypt** (`min_length=8`).
+
+> Plano completo, ordem de implementação e checklists: [`docs/SECURITY.md`](docs/SECURITY.md).
+> Config de produção é validada no boot (falha rápido se `SECRET_KEY` fraca ou
+> `COOKIE_SECURE=false`).
 
 ## 📦 API (endpoints)
 
 | Módulo | Método | Rota | Descrição |
 | ------ | ------ | ---- | --------- |
-| **auth** | POST | `/auth/register` | Criar usuário |
-| | POST | `/auth/login` | Login (OAuth2 form → JWT) |
-| | DELETE | `/auth/delete_user` | Excluir usuário |
+| **auth** | POST | `/auth/register` | Criar usuário (rate limited) |
+| | POST | `/auth/login` | Login (OAuth2 form → cookies HttpOnly) |
+| | POST | `/auth/refresh` | Rotaciona o par de tokens |
+| | POST | `/auth/logout` | Revoga tokens e limpa cookies |
+| | GET | `/auth/me` | Usuário da sessão |
+| | GET | `/auth/csrf` | Renova o cookie CSRF |
+| | DELETE | `/auth/me` | Excluir a **própria** conta |
+| | DELETE | `/auth/delete_user` | *Deprecated* (legado `frontend/`; só a própria conta) |
 | **category** | POST | `/category/create` | Criar categoria |
 | | GET | `/category/list` | Listar categorias do usuário |
 | | PATCH | `/category/update/{id}` | Atualizar categoria |
@@ -93,13 +132,14 @@ Authorization: Bearer <token>
 | | GET | `/report/top` | Maior despesa |
 | | GET | `/report/average` | Média de despesas |
 
-Documentação interativa (Swagger/OpenAPI) disponível em `/docs`.
+Documentação interativa (Swagger/OpenAPI) disponível em `/docs` — desabilitada
+em produção (`ENABLE_DOCS=false`).
 
 ---
 
 ## ⚙️ Tecnologias
 
-**Backend:** Python 3.12+ · FastAPI · SQLAlchemy 2.0 · Pydantic v2 · python-jose (JWT) · passlib/bcrypt · Pytest · Alembic
+**Backend:** Python 3.12+ · FastAPI · SQLAlchemy 2.0 · Pydantic v2 · python-jose (JWT) · passlib/bcrypt · slowapi (rate limit) · Pytest · Alembic · Ruff (lint/bandit)
 
 **Frontend:** React 19 · Vite · Tailwind CSS v4 · shadcn/ui (Radix) · react-hook-form + zod · axios · React Router 7 · sonner · lucide-react
 

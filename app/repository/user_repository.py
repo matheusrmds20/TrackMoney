@@ -1,9 +1,8 @@
-from app.db.models.user import UserDB
-from sqlalchemy.orm import Session
-from app.core.security import hash_password
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
-
+from app.core.security import hash_password
+from app.db.models.user import UserDB
 
 
 class UserRepository:

@@ -1,6 +1,7 @@
-from app.db.models.trasactions import TransactionsDB, TransactionType
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+
+from app.db.models.trasactions import TransactionsDB, TransactionType
 
 
 class TransactionRepository:
