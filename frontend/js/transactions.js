@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://trackmoney-jjnl.onrender.com";
+const API_BASE_URL = "https://api.matheuslab.xyz";
 
 let allTransactions = [];
 let categories = [];

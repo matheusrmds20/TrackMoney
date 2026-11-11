@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE = "https://trackmoney-jjnl.onrender.com";
+  const API_BASE = "https://api.matheuslab.xyz";
 
   let categories = [];
   let editingId = null;

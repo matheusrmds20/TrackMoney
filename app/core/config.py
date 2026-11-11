@@ -20,9 +20,10 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 14
     DATABASE_URL: str = _DEFAULT_DEV_DB
 
-    FRONTEND_ORIGINS: str = "http://localhost:5173,https://ledger.matheuslab.xyz"
+    FRONTEND_ORIGINS: str = "http://localhost:5173, https://ledger.matheuslab.xyz"
+    # Hosts aceitos no header `Host` (sem esquema: TrustedHost compara host[:port]).
     ALLOWED_HOSTS: str = (
-        "localhost,127.0.0.1,testserver,trackmoney-jjnl.onrender.com,api.matheuslab.xyz,https://api.ledger.matheuslab.xyz"
+        "localhost,127.0.0.1,testserver,api.ledger.matheuslab.xyz,api.matheuslab.xyz,trackmoney-jjnl.onrender.com"
     )
 
     COOKIE_DOMAIN: str | None = None

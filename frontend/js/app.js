@@ -1,4 +1,4 @@
-const API = "https://trackmoney-jjnl.onrender.com";
+const API = "https://api.matheuslab.xyz";
 let currentTab = "login";
 
 function setStatus(id, msg, type) {
