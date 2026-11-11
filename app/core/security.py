@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 import bcrypt
-from jose import jwt
+import jwt
 from passlib.context import CryptContext
 
 from app.core.config import settings
@@ -49,7 +49,7 @@ def create_token(data: dict, expires_minutes: int | None = None) -> str:
     now = datetime.now(timezone.utc)
     expire = now + timedelta(minutes=expires_minutes or settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {**data, "iat": now, "exp": expire, "type": "access", "jti": uuid4().hex}
-    return jwt.encode(payload, settings.SECRET_KEY, settings.ALGORITHM)
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
 def create_refresh_token(user_id: int) -> str:
@@ -63,7 +63,7 @@ def create_refresh_token(user_id: int) -> str:
         "type": "refresh",
         "jti": uuid4().hex,
     }
-    return jwt.encode(payload, settings.SECRET_KEY, settings.ALGORITHM)
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
 def create_csrf_token() -> str:

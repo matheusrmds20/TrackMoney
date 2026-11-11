@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from jose import JWTError, jwt
+import jwt
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -10,7 +10,7 @@ from app.db.models.refresh_token import RefreshTokenDB, RevokedAccessTokenDB
 def decode_token(raw: str, expected_type: str) -> dict | None:
     try:
         payload = jwt.decode(raw, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-    except JWTError:
+    except jwt.InvalidTokenError:
         return None
     if payload.get("type") != expected_type or not payload.get("jti") or not payload.get("sub"):
         return None

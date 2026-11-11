@@ -139,7 +139,7 @@ em produção (`ENABLE_DOCS=false`).
 
 ## ⚙️ Tecnologias
 
-**Backend:** Python 3.12+ · FastAPI · SQLAlchemy 2.0 · Pydantic v2 · python-jose (JWT) · passlib/bcrypt · slowapi (rate limit) · Pytest · Alembic · Ruff (lint/bandit)
+**Backend:** Python 3.12+ · FastAPI · SQLAlchemy 2.0 · Pydantic v2 · PyJWT (JWT) · passlib/bcrypt · slowapi (rate limit) · Pytest · Alembic · Ruff (lint/bandit)
 
 **Frontend:** React 19 · Vite · Tailwind CSS v4 · shadcn/ui (Radix) · react-hook-form + zod · axios · React Router 7 · sonner · lucide-react
 
