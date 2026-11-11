@@ -241,17 +241,3 @@ As migrações de banco ficam em `alembic/versions/`. Exemplo de aplicação de 
 ```bash
 alembic upgrade head
 ```
-
----
-
-## 🌐 Deploy (provisionamento)
-
-- **API:** hospedada na **Render** (`trackmoney-jjnl.onrender.com`) com proxy de headers.
-- **Frontend:** publicado na **Vercel** (`track-money-blue.vercel.app`).
-  - Rewrite de SPA em `vercel.json`: qualquer rota (`/dashboard`, `/despesas`, …) é
-    servida por `index.html`, senão o F5 numa rota interna retorna
-    `404 NOT_FOUND` da Vercel.
-  - Se o **Root Directory** do projeto na Vercel for `web`, vale o `web/vercel.json`;
-    se for a raiz do repositório, vale o `vercel.json` da raiz (build em `web/`,
-    output `web/dist`). Mantenha apenas o que corresponde à sua configuração.
-- A lista de origens permitidas pelo **CORS** está em `app/main.py` (origens de produção já incluídas).
