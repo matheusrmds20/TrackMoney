@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { MonthYearPicker } from '@/components/MonthYearPicker'
 import { CategoryDialog } from '@/components/CategoryDialog'
+import { BalanceAreaChart } from '@/components/BalanceAreaChart'
 import { useCategories } from '@/lib/useCategories'
 import { TrendingDown, TrendingUp, Plus, Receipt, RefreshCw, AlertCircle, FolderPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -21,6 +22,7 @@ export default function Dashboard() {
   const [range, setRange] = useState(current)
   const [report, setReport] = useState(null)
   const [recent, setRecent] = useState([])
+  const [monthTxns, setMonthTxns] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [openCategory, setOpenCategory] = useState(false)
@@ -36,9 +38,10 @@ export default function Dashboard() {
       const isEmptyStatus = (reason) =>
         [400, 404].includes(reason?.response?.status)
 
-      const [repRes, txnRes] = await Promise.allSettled([
+      const [repRes, txnRes, monthlyTxnRes] = await Promise.allSettled([
         api.get('/report/monthly_report', { params: range }),
-        api.get('/transactions/list', { params: { page: 1, limit: 8 } }),
+        api.get('/transactions/list', { params: { page: 1, limit: 5 } }),
+        api.get('/transactions/monthly_transactions', { params: range }),
       ])
 
       let rep = null
@@ -53,13 +56,20 @@ export default function Dashboard() {
         throw txnRes.reason
       }
 
+      let mTxn = []
+      if (monthlyTxnRes.status === 'fulfilled') {
+        mTxn = Array.isArray(monthlyTxnRes.value.data) ? monthlyTxnRes.value.data : []
+      }
+
       setReport(rep)
       setRecent(txn)
+      setMonthTxns(mTxn)
     } catch (e) {
       // Sem dados confiáveis: mantém o relatório zerado para não exibir
       // números falsos, mas mostra o estado de erro com opção de tentar de novo.
       setReport({ income: 0, expense: 0, by_category: {} })
       setRecent([])
+      setMonthTxns([])
       setError(e.message)
       toast.error('Não foi possível carregar o painel.')
     } finally {
@@ -88,8 +98,11 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <PageHead title={`Balanço de ${title}`} eyebrow="Visão geral">
-        <MonthYearPicker value={range} onChange={setRange} />
+      <PageHead
+        title={`Balanço de ${title}`}
+        eyebrow="Visão geral"
+        action={<MonthYearPicker value={range} onChange={setRange} />}
+      >
         <ErrorState onRetry={load} />
       </PageHead>
     )
@@ -97,8 +110,11 @@ export default function Dashboard() {
 
   if (isEmpty) {
     return (
-      <PageHead title={`Balanço de ${title}`} eyebrow="Visão geral">
-        <MonthYearPicker value={range} onChange={setRange} />
+      <PageHead
+        title={`Balanço de ${title}`}
+        eyebrow="Visão geral"
+        action={<MonthYearPicker value={range} onChange={setRange} />}
+      >
         <EmptyDashboard
           needsCategory={hasNoCategories}
           onCreateCategory={() => setOpenCategory(true)}
@@ -117,8 +133,11 @@ export default function Dashboard() {
   }
 
   return (
-    <PageHead title={loading ? 'Carregando…' : `Balanço de ${title}`} eyebrow="Visão geral">
-      <MonthYearPicker value={range} onChange={setRange} />
+    <PageHead
+      title={loading ? 'Carregando…' : `Balanço de ${title}`}
+      eyebrow="Visão geral"
+      action={<MonthYearPicker value={range} onChange={setRange} />}
+    >
 
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-10 sm:divide-x sm:divide-border">
         {loading ? (
@@ -156,14 +175,11 @@ export default function Dashboard() {
       <div className="mt-9 grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr]">
         {/* Lançamentos recentes */}
         <section>
-          <SectionTitle
-            title="Lançamentos recentes"
-            action={<span className="text-primary">Janeiro · todas</span>}
-          />
+          <SectionTitle title="Lançamentos recentes" />
           <div className="mt-3 overflow-hidden rounded-xl border border-border">
             <TableHead />
             {loading ? (
-              <LoadingRows rows={4} />
+              <LoadingRows rows={5} />
             ) : recent.length === 0 ? (
               hasNoCategories ? (
                 <EmptyRow
@@ -219,13 +235,23 @@ export default function Dashboard() {
           </div>
         </section>
       </div>
+
+      {/* Gráfico de Evolução do Saldo */}
+      <div className="mt-8">
+        <BalanceAreaChart
+          transactions={monthTxns.length ? monthTxns : recent}
+          currentBalance={balance}
+          month={range.month}
+          year={range.year}
+        />
+      </div>
     </PageHead>
   )
 }
 
 /* ---------- subcomponentes ---------- */
 
-function PageHead({ eyebrow, title, children }) {
+function PageHead({ eyebrow, title, action, children }) {
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -235,15 +261,16 @@ function PageHead({ eyebrow, title, children }) {
           </p>
           <h1 className="display mt-1 text-3xl">{title}</h1>
         </div>
-        {children}
+        {action}
       </div>
+      {children}
     </div>
   )
 }
 
 function SectionTitle({ title, action }) {
   return (
-    <div className="flex items-baseline justify-between">
+    <div className="flex h-6 items-center justify-between">
       <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
         {title}
       </h2>
@@ -338,27 +365,27 @@ function ErrorState({ onRetry }) {
 
 function EmptyDashboard({ onCreate, needsCategory, onCreateCategory }) {
   return (
-    <div className="mt-10 flex flex-col items-center rounded-xl border border-dashed border-border bg-card px-6 py-16 text-center">
-      <div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-        <Receipt className="size-6" />
+    <div className="mt-10 flex min-h-[380px] w-full flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card px-8 py-20 text-center shadow-sm">
+      <div className="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <Receipt className="size-8" />
       </div>
-      <h2 className="display mt-5 text-2xl">Sua conta ainda está vazia</h2>
-      <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+      <h2 className="display mt-6 text-2xl sm:text-3xl">Sua conta ainda está vazia</h2>
+      <p className="mt-3 max-w-lg text-base text-muted-foreground">
         {needsCategory
           ? 'Antes de registrar um lançamento, crie ao menos uma categoria — é ela que classifica despesas e receitas.'
           : 'Nada por aqui ainda. Registre sua primeira movimentação para ver aqui o resumo do mês ao vivo.'}
       </p>
-      <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         {needsCategory ? (
-          <Button onClick={onCreateCategory}>
+          <Button size="lg" onClick={onCreateCategory}>
             <FolderPlus /> Criar categoria
           </Button>
         ) : (
           <>
-            <Button onClick={() => onCreate('expense')}>
+            <Button size="lg" onClick={() => onCreate('expense')}>
               <TrendingDown /> Criar despesa
             </Button>
-            <Button variant="outline" onClick={() => onCreate('income')}>
+            <Button size="lg" variant="outline" onClick={() => onCreate('income')}>
               <TrendingUp /> Criar receita
             </Button>
           </>

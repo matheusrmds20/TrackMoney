@@ -108,6 +108,7 @@
 .lp-legend .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-left: 5px; }
 .lp-legend .dot.g { background: var(--income); }
 .lp-legend .dot.r { background: var(--expense); }
+.lp-legend .dot.gold { background: var(--primary); }
 .lp-bars { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
 .lp-bars span { flex: 1; min-height: 6px; position: relative; transform-origin: bottom; }
 .lp-bars span i { position: absolute; inset: 0; border-radius: 5px 5px 2px 2px; }

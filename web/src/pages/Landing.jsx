@@ -97,18 +97,6 @@ const REPORT_ROWS = [
   { name: 'Lazer', w: '15%', color: 'var(--income)', amt: 'R$ 598' },
 ]
 
-/* Linhas animadas do gráfico de barras do mock (altura % + delay) */
-const BARS = [
-  { h: '82%', type: 'g', delay: '.78s' },
-  { h: '58%', type: 'r', delay: '.86s' },
-  { h: '70%', type: 'g', delay: '.94s' },
-  { h: '45%', type: 'r', delay: '1.02s' },
-  { h: '88%', type: 'g', delay: '1.1s' },
-  { h: '62%', type: 'r', delay: '1.18s' },
-  { h: '76%', type: 'g', delay: '1.26s' },
-  { h: '50%', type: 'r', delay: '1.34s' },
-]
-
 function Counter({ to, suffix }) {
   const ref = useRef(null)
   useEffect(() => {
@@ -309,30 +297,45 @@ export default function Landing() {
 
                 <div className="lp-chart">
                   <div className="lp-chart-head">
-                    <span className="t">Fluxo do mês</span>
+                    <span className="t">Evolução do saldo</span>
                     <span className="lp-legend">
                       <span>
-                        Receitas
-                        <i className="dot g" />
-                      </span>
-                      <span>
-                        Despesas
-                        <i className="dot r" />
+                        Saldo diário
+                        <i className="dot gold" />
                       </span>
                     </span>
                   </div>
-                  <div className="lp-bars">
-                    {BARS.map((b, i) => (
-                      <span key={i} style={{ height: b.h }}>
-                        <i className={b.type} style={{ animationDelay: b.delay }} />
-                      </span>
-                    ))}
+                  <div className="relative h-[115px] w-full pt-1">
+                    <svg viewBox="0 0 400 120" className="size-full overflow-visible" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="lpHeroGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.4" />
+                          <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+                      <line x1="0" y1="30" x2="400" y2="30" stroke="currentColor" strokeDasharray="3 3" className="text-border/50" strokeWidth="1" />
+                      <line x1="0" y1="75" x2="400" y2="75" stroke="currentColor" strokeDasharray="3 3" className="text-border/50" strokeWidth="1" />
+                      
+                      <path
+                        d="M 0,95 Q 40,88 80,65 T 160,75 T 240,42 T 320,32 T 400,14 L 400,120 L 0,120 Z"
+                        fill="url(#lpHeroGrad)"
+                      />
+                      <path
+                        d="M 0,95 Q 40,88 80,65 T 160,75 T 240,42 T 320,32 T 400,14"
+                        fill="none"
+                        stroke="var(--primary)"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      />
+                      <circle cx="240" cy="42" r="3.5" fill="var(--card)" stroke="var(--primary)" strokeWidth="2" />
+                      <circle cx="400" cy="14" r="3.5" fill="var(--card)" stroke="var(--primary)" strokeWidth="2" />
+                    </svg>
                   </div>
                   <div className="lp-bar-x">
-                    <span>Q1</span>
-                    <span>Q2</span>
-                    <span>Q3</span>
-                    <span>Q4</span>
+                    <span>Sem 1</span>
+                    <span>Sem 2</span>
+                    <span>Sem 3</span>
+                    <span>Sem 4</span>
                   </div>
                 </div>
 
