@@ -1,8 +1,8 @@
-# TrackMoney · Ledger
+# Ledger
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white) ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white) ![Pydantic](https://img.shields.io/badge/pydantic-%23E92063.svg?style=for-the-badge&logo=pydantic&logoColor=white) ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
 
-Aplicação **full-stack de finanças pessoais** (*TrackMoney*, redimensionada como **Ledger**). O backend é uma **API RESTful** em **FastAPI** + **SQLAlchemy** com autenticação **JWT**; o frontend é um **SPA em React + Vite + Tailwind CSS v4** com design system *Papel / Noir*.
+Aplicação **full-stack de finanças pessoais** (**Ledger**). O backend é uma **API RESTful** em **FastAPI** + **SQLAlchemy** com autenticação **JWT**; o frontend é um **SPA em React + Vite + Tailwind CSS v4** com design system *Papel / Noir*.
 
 O frontend React fica em `web/` (stack atual). Existe também um frontend antigo em HTML/CSS/JS estático dentro de `frontend/`, que foi substituído pelo novo SPA em React.
 
@@ -158,8 +158,8 @@ O banco de dados (**PostgreSQL 16**) roda isolado em um container Docker.
 
 ### 1️⃣ Clonar o repositório
 ```bash
-git clone https://github.com/matheusrmds20/TrackMoney
-cd TrackMoney
+git clone https://github.com/matheusrmds20/Ledger
+cd Ledger
 ```
 
 ### 2️⃣ Criar ambiente virtual (somente backend)

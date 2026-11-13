@@ -1,8 +1,8 @@
-# Ledger · TrackMoney (frontend React)
+# Ledger · (frontend React)
 
 Frontend do fintech **Ledger** — redesenhado do zero em React + Vite, com o design
 system **Ledger Paper (claro) / Noir (escuro)** com toggle. Mantém a essência do
-TrackMoney (finanças pessoais) e o tema, mudando stack, fluxo e arquitetura.
+frontend original de finanças pessoais (_Ledger_), mudando stack, fluxo e arquitetura.
 
 ## Stack
 
